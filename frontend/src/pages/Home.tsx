@@ -9,13 +9,13 @@ const Home = () => {
     <div>
       <Navbar />
       {/* Hero Section */}
-      <div className='w-full h-[300px] flex flex-row items-center justify-center bg-gray-700 text-white'>
+      <div className='w-full h-auto flex flex-row items-center justify-center bg-gray-700 text-white'>
         <h1 className='text-4xl font-bold'>Find Your First GitHub Contribution</h1>
         <p>Browse beginner-friendly GitHub repositories with issues tagged for new contributors. Filter by programming language and difficulty level to find the perfect project to contribute to.</p>
         <button className='mt-4 px-6 py-2 bg-blue-600 text-white rounded' onClick={() => navigate('/survey')}>Get Started</button>
       </div>
        {/* Section 1 */}
-       <div className='w-full h-[300px] flex flex-row items-center justify-center bg-gray-800 text-white'>
+       <div className='w-full h-auto flex flex-row items-center justify-center bg-gray-800 text-white'>
          <h2 className='text-3xl font-bold'>Simple Repository Discovery</h2>
          <p>Find GitHub repositories that welcome new contributors</p>
          <div>
@@ -25,7 +25,7 @@ const Home = () => {
          </div>
        </div>
         {/* Section 2*/}
-       <div className='w-full h-[300px] flex flex-row items-center justify-center bg-gray-900 text-white'>
+       <div className='w-full h-auto flex flex-row items-center justify-center bg-gray-900 text-white'>
         <div>
          <h2 className='text-3xl font-bold'>How It Works</h2>
          <p>Find and contribute to open source projects in just a few steps</p>
@@ -38,7 +38,7 @@ const Home = () => {
          </div>
        </div>
         {/* Section 3*/}
-       <div className='w-full h-[300px] flex flex-row items-center justify-center bg-gray-800 text-white'>
+       <div className='w-full h-auto flex flex-row items-center justify-center bg-gray-800 text-white'>
          <h2 className='text-3xl font-bold'>Ready to Contribute to Open Source?</h2>
          <p>Start exploring GitHub repositories that are perfect for your first contribution</p>
          <button className='mt-4 px-6 py-2 bg-blue-600 text-white rounded' onClick={() => navigate('/survey')}>Get Started</button>
