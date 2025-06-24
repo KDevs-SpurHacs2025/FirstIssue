@@ -32,6 +32,12 @@ export interface UserSurveyAnswers {
   experiencedUrls: string[]; // URLs of previous open-source contributions
 }
 
+// --- Type Definition for Contribution Direction ---
+export interface ContributionDirection {
+  title: string; // Brief title of the contribution type
+  description: string; // Detailed description of what the user can do
+}
+
 // --- Type Definition for Open Source Recommendation Output ---
 export interface OpenSourceRecommendation {
   Rank: number; // 1-5, 1 being the most recommended
@@ -46,7 +52,7 @@ export interface OpenSourceRecommendation {
   ReasonForRecommendation: string; // Concise explanation
   CurrentStatusDevelopmentDirection: string;
   GoodFirstIssue: boolean; // true if the project currently has beginner-friendly issues
-  ContributionDirections: string[]; // Specific ways a user can contribute (e.g., "Fixing beginner bugs", "Improving documentation")
+  ContributionDirections: ContributionDirection[]; // Specific ways a user can contribute with detailed descriptions
 }
 
 // --- Helper function to get current date in YYYY-MM-DD format ---
@@ -283,7 +289,7 @@ You are an AI assistant specialized in open-source contribution recommendations.
     - ReasonForRecommendation (A **very concise, one-sentence summary** explaining the primary reason this project is suitable for the user, referencing their skills/interests and repo analysis. Example: "This project directly aligns with the user's React skills and their wish to learn Three.js, leveraging their frontend development strengths.")
     - CurrentStatusDevelopmentDirection (Information about recent activity and future plans.)
     - GoodFirstIssue (true/false)
-    - ContributionDirections (A list of **1 to 3 highly specific and actionable ways** the user can contribute to this project, based on their skills and the project's nature. Each item should be a clear, concise action. Example: ["Fix beginner-friendly bugs.", "Improve component documentation for new features.", "Write unit tests for core functionalities."])
+    - ContributionDirections (A list of **1 to 3 highly specific and actionable ways** the user can contribute to this project, based on their skills and the project's nature. Each item should be an object with 'title' and 'description' fields. The title should be a brief, clear action name (e.g., "Documentation Enhancement", "Bug Fixing"), and the description should provide detailed, actionable steps or context. Example: [{"title": "Documentation Enhancement", "description": "Improve existing documentation by adding code examples, clarifying setup instructions, and creating beginner-friendly tutorials for new contributors."}, {"title": "Bug Fixing", "description": "Identify and fix beginner-friendly bugs labeled as 'good first issue', focusing on issues related to UI components or data validation."}, {"title": "Testing", "description": "Write comprehensive unit tests for core functionalities, especially for newly added features that lack test coverage."}])
 
 Survey Responses:
 - Q1. Reason for contributing to open source: ${answers.reason}
@@ -318,7 +324,20 @@ Output Format (Strictly follow this JSON array structure):
     "ReasonForRecommendation": "A very concise, one-sentence summary explaining the primary reason this project is suitable for the user, referencing their skills/interests and repo analysis.",
     "CurrentStatusDevelopmentDirection": "Information about recent activity and future plans.",
     "GoodFirstIssue": true,
-    "ContributionDirections": ["Fix beginner-friendly bugs.", "Improve component documentation.", "Add new test cases."]
+    "ContributionDirections": [
+      {
+        "title": "Documentation Enhancement",
+        "description": "Improve existing documentation by adding code examples, clarifying setup instructions, and creating beginner-friendly tutorials for new contributors."
+      },
+      {
+        "title": "Bug Fixing",
+        "description": "Identify and fix beginner-friendly bugs labeled as 'good first issue', focusing on issues related to UI components or data validation."
+      },
+      {
+        "title": "Testing",
+        "description": "Write comprehensive unit tests for core functionalities, especially for newly added features that lack test coverage."
+      }
+    ]
   }
 ]
 `;

@@ -1,8 +1,19 @@
 import { Request, Response } from 'express';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import dotenv from 'dotenv';
 import logger from '../utils/logger'; // Assuming you have this logger utility
 
-const apiKey = "AIzaSyB3WRWWkUuz8ba42QUFBc6HM4CJ04YLyRg"; // Get API key from environment variables
+// Load environment variables (dotenv will look for .env in the current working directory)
+dotenv.config();
+
+// Debug: Check if environment variables are loaded
+logger.info('Environment variables debug:', {
+    PORT: process.env.PORT,
+    GEMINI_API_KEY_LENGTH: process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.length : 'undefined',
+    NODE_ENV: process.env.NODE_ENV
+});
+
+const apiKey = process.env.GEMINI_API_KEY; // Get API key from environment variables
 
 if (!apiKey) {
     logger.error('GEMINI_API_KEY is not set in environment variables for chatbotController. Please set it in your .env file or environment variables.');
@@ -12,7 +23,7 @@ else {
 }
 
 
-// API 키가 있을 경우에만 GoogleGenerativeAI 인스턴스를 생성
+// Initialize GoogleGenerativeAI with the API key if available
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 export const chatbotController = async (req: Request, res: Response): Promise<void> => {
