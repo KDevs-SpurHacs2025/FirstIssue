@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
-
+import { OpenSourceRecommendation } from '../services/geminiService';
 export interface IOpenSourceSurvey extends Document {
   userId: string;
   reason: string;
@@ -10,6 +10,7 @@ export interface IOpenSourceSurvey extends Document {
   wishToLearn: string[];
   numOfExperience: number;
   experiencedUrls: string[];
+  recommendations?: OpenSourceRecommendation[]; 
   createdAt?: Date;
 }
 
@@ -23,7 +24,8 @@ const OpenSourceSurveySchema: Schema = new Schema(
     like: { type: [String] },
     wishToLearn: { type: [String] },
     numOfExperience: { type: Number },
-    experiencedUrls: { type: [String] }
+    experiencedUrls: { type: [String] },
+    recommendations: { type: [Schema.Types.Mixed] } 
   },
   { timestamps: true }
 );

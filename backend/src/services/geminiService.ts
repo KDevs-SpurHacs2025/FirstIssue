@@ -2,9 +2,6 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import logger from '../utils/logger'; // Assuming you have a logger utility
 
 // --- Type Definitions for AI Analysis ---
-// These type definitions clarify the JSON structure that the AI should generate
-// when analyzing a repository. The prompts will enforce that the AI strictly
-// adheres to this structure and the specified skill levels.
 export type SkillLevel = "Novice" | "Beginner" | "Intermediate" | "Advanced" | "Expert";
 
 export interface RepoAnalysisResult {
@@ -14,10 +11,9 @@ export interface RepoAnalysisResult {
   packages: { name: string; skill: SkillLevel }[];
   habits: { strengths: string[]; improvements: string[] };
   overallSkillLevel: SkillLevel; // A single summarized skill level for the developer based on all findings
-  // Optional fields for error handling or raw response from Gemini
-  error?: string;
-  detail?: string;
-  rawGeminiResponse?: string;
+  error?: string; // Optional field for error handling
+  detail?: string; // Optional detail for errors
+  rawGeminiResponse?: string; // Optional raw response for debugging
 }
 
 // --- Type Definition for User Survey Answers ---
@@ -32,8 +28,9 @@ export interface UserSurveyAnswers {
   experiencedUrls: string[]; // URLs of previous open-source contributions
 }
 
-// --- Type Definition for Contribution Direction ---
+// --- Type Definition for Contribution Direction (for recommended projects) ---
 export interface ContributionDirection {
+  number: number; // Sequential order, 1 from easiest to most challenging
   title: string; // Brief title of the contribution type
   description: string; // Detailed description of what the user can do
 }
@@ -75,16 +72,16 @@ function getTodayDateString(): string {
 export async function analyzeGitRepoProfile(
   repoUrl: string,
   repoType?: string
-): Promise<RepoAnalysisResult> {
+): Promise<RepoAnalysisResult & { repoUrl: string }> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     logger.error('Error: GEMINI_API_KEY is not set in environment variables for repo analysis.');
-    // Return a default/error analysis result following the RepoAnalysisResult interface
     return {
       devDirection: 'N/A', languages: [], frameworks: [], packages: [],
       habits: { strengths: [], improvements: [] }, overallSkillLevel: 'Novice',
       error: 'Failed to analyze with Gemini',
-      detail: 'API Key not configured.'
+      detail: 'API Key not configured.',
+      repoUrl
     };
   }
 
@@ -122,57 +119,58 @@ Return the result as a JSON object with the following structure:
     const result = await model.generateContent(prompt);
     if (!result || !result.response || !result.response.text) {
       logger.error('Gemini API did not return a valid response for repo analysis.');
-      // Return a default/error analysis result following the RepoAnalysisResult interface
       return {
         devDirection: 'N/A', languages: [], frameworks: [], packages: [],
         habits: { strengths: [], improvements: [] }, overallSkillLevel: 'Novice',
         error: 'Failed to analyze with Gemini',
         detail: 'Invalid response from Gemini API',
-        rawGeminiResponse: result?.response?.text() || 'No text in response' // Provide raw response for debugging
+        rawGeminiResponse: result?.response?.text() || 'No text in response',
+        repoUrl
       };
     }
 
     const text = result.response.text();
-    // Remove markdown code block fences (```json\n and ```) from the response text
     const jsonString = text.replace(/```json\n|```/g, '').trim();
     logger.info(`Gemini API response for ${repoUrl}:`, jsonString);
 
-    let analysis: RepoAnalysisResult; // Declare analysis with its proper type
+    let analysis: RepoAnalysisResult;
     try {
       analysis = JSON.parse(jsonString);
     } catch (parseError: any) {
       logger.error(`Failed to parse Gemini API response for ${repoUrl} as JSON:`, parseError);
-      // Return a default/error analysis result if JSON parsing fails
       return {
         devDirection: 'N/A', languages: [], frameworks: [], packages: [],
         habits: { strengths: [], improvements: [] }, overallSkillLevel: 'Novice',
         error: 'Failed to parse Gemini response',
         detail: parseError.message,
-        rawGeminiResponse: text
+        rawGeminiResponse: text,
+        repoUrl
       };
     }
-    return analysis;
+    return { ...analysis, repoUrl };
   } catch (err: any) {
     logger.error(`Error calling Gemini API for repo ${repoUrl}:`, err.message);
-    // Return a default/error analysis result if API call fails
     return {
       devDirection: 'N/A', languages: [], frameworks: [], packages: [],
       habits: { strengths: [], improvements: [] }, overallSkillLevel: 'Novice',
       error: 'Failed to analyze with Gemini',
-      detail: err.message
+      detail: err.message,
+      repoUrl
     };
   }
 }
 
 // --- analyzeUserOpenSourceProfile function ---
 /**
- * Analyzes user survey answers and Git repository profiles to recommend open-source
+ * Analyzes user survey answers and pre-analyzed Git repository profiles to recommend open-source
  * contribution projects using the Gemini API.
  * @param answers User's survey answers data.
+ * @param repoAnalyses Array of pre-analyzed repository profiles (from analyzeGitRepoProfile)
  * @returns A JSON object containing success status and a list of recommended open-source projects.
  */
 export async function analyzeUserOpenSourceProfile(
-  answers: UserSurveyAnswers
+  answers: UserSurveyAnswers,
+  repoAnalyses: RepoAnalysisResult[]
 ): Promise<{ success: boolean; recommendations: OpenSourceRecommendation[] } | { error: string; detail: string; rawResponse?: string }> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -183,54 +181,31 @@ export async function analyzeUserOpenSourceProfile(
   try {
     const todayDate = getTodayDateString();
 
-    // Analyze each public repo using analyzeGitRepoProfile
-    const repoAnalyses: RepoAnalysisResult[] = [];
-    let overallHighestSkill: SkillLevel = "Novice"; // Track the highest skill level found across all repos
+    let overallHighestSkill: SkillLevel = "Novice";
     const skillOrder: SkillLevel[] = ["Novice", "Beginner", "Intermediate", "Advanced", "Expert"];
 
-    for (let i = 0; i < answers.publicRepos.length; i++) {
-      const repoUrl = answers.publicRepos[i];
-      const repoType = answers.repoTypes && answers.repoTypes[i] ? answers.repoTypes[i] : 'N/A';
-      if (repoUrl) {
-        try {
-          const analysis = await analyzeGitRepoProfile(repoUrl, repoType);
-          repoAnalyses.push(analysis);
-
-          // Update overallHighestSkill based on the current repo's overallSkillLevel
-          if (analysis.overallSkillLevel) {
-            const currentSkillIndex = skillOrder.indexOf(analysis.overallSkillLevel);
-            const highestSkillIndex = skillOrder.indexOf(overallHighestSkill);
-            if (currentSkillIndex > highestSkillIndex) {
-              overallHighestSkill = analysis.overallSkillLevel;
-            }
-          }
-
-        } catch (err: any) {
-          logger.error(`Failed to analyze repo ${repoUrl} for recommendations:`, err.message);
-          // Push a partial/error analysis to ensure the prompt structure remains consistent,
-          // but indicate it's an error.
-          repoAnalyses.push({
-            devDirection: 'N/A', languages: [], frameworks: [], packages: [],
-            habits: { strengths: [], improvements: [] }, overallSkillLevel: 'Novice',
-            error: 'Failed to analyze this repo',
-            detail: err.message
-          });
+    for (let i = 0; i < repoAnalyses.length; i++) {
+      const analysis = repoAnalyses[i];
+      if (analysis && analysis.overallSkillLevel) {
+        const currentSkillIndex = skillOrder.indexOf(analysis.overallSkillLevel);
+        const highestSkillIndex = skillOrder.indexOf(overallHighestSkill);
+        if (currentSkillIndex > highestSkillIndex) {
+          overallHighestSkill = analysis.overallSkillLevel;
         }
       }
     }
 
     // Determine the maximum allowed difficulty for recommendations
     let maxRecommendedDifficulty: SkillLevel = overallHighestSkill;
-    if (answers.numOfExperience === 0) { // If the user has no prior open-source experience
+    if (answers.numOfExperience === 0) {
       const highestSkillIndex = skillOrder.indexOf(overallHighestSkill);
-      if (highestSkillIndex > 0) { // If not already Novice, reduce skill level by one
+      if (highestSkillIndex > 0) {
         maxRecommendedDifficulty = skillOrder[highestSkillIndex - 1];
-      } else { // If already Novice, recommend Novice projects
+      } else {
         maxRecommendedDifficulty = "Novice";
       }
       logger.info(`User has 0 experience, adjusting max recommended difficulty from ${overallHighestSkill} to ${maxRecommendedDifficulty}`);
     }
-
 
     // Format public repos list for the prompt string
     let repoList = '';
@@ -245,20 +220,17 @@ export async function analyzeUserOpenSourceProfile(
     if (answers.experiencedUrls && answers.experiencedUrls.length > 0) {
       for (let i = 0; i < answers.experiencedUrls.length; i++) {
         const url = answers.experiencedUrls[i];
-        if (url && url.trim() !== "") { // Filter out empty strings if any
+        if (url && url.trim() !== "") {
           experienceList += `      - ${url}\n`;
         }
       }
     }
-    if (experienceList === '') { // If no valid URLs, state N/A to the AI
+    if (experienceList === '') {
         experienceList = '      N/A\n';
     }
 
-
     // Format repo analysis summary as a JSON string for the prompt
-    // This will now be a JSON array of analysis results generated by analyzeGitRepoProfile
     const repoAnalysisSummary = JSON.stringify(repoAnalyses, null, 2);
-
 
     const prompt = `
 You are an AI assistant specialized in open-source contribution recommendations. You will analyze user survey responses, public Git repos (with types), and provided AI-based repo analysis (developer style, skills, strengths, weaknesses).
@@ -289,7 +261,11 @@ You are an AI assistant specialized in open-source contribution recommendations.
     - ReasonForRecommendation (A **very concise, one-sentence summary** explaining the primary reason this project is suitable for the user, referencing their skills/interests and repo analysis. Example: "This project directly aligns with the user's React skills and their wish to learn Three.js, leveraging their frontend development strengths.")
     - CurrentStatusDevelopmentDirection (Information about recent activity and future plans.)
     - GoodFirstIssue (true/false)
-    - ContributionDirections (A list of **1 to 3 highly specific and actionable ways** the user can contribute to this project, based on their skills and the project's nature. Each item should be an object with 'title' and 'description' fields. The title should be a brief, clear action name (e.g., "Documentation Enhancement", "Bug Fixing"), and the description should provide detailed, actionable steps or context. Example: [{"title": "Documentation Enhancement", "description": "Improve existing documentation by adding code examples, clarifying setup instructions, and creating beginner-friendly tutorials for new contributors."}, {"title": "Bug Fixing", "description": "Identify and fix beginner-friendly bugs labeled as 'good first issue', focusing on issues related to UI components or data validation."}, {"title": "Testing", "description": "Write comprehensive unit tests for core functionalities, especially for newly added features that lack test coverage."}])
+    - ContributionDirections (A list of **1 to 3 highly specific and actionable ways** the user can contribute to this project, based on their skills and the project's nature. Each item must be an object with 'number', 'title', and 'description' fields. The 'number' field is a sequential integer starting from 1, representing the action's order from easiest to most challenging. The array MUST be sorted by this 'number' field.
+      Guidance for 'description' content based on difficulty:
+        1. **Novice/Beginner:** Focus on tasks with low barrier to entry like documentation improvements (fix typos, add missing examples), README enhancements, translation work, or very simple UI fixes. Helps user understand basic project structure and Git workflow.
+        2. **Intermediate:** Focus on tasks requiring some codebase understanding like fixing 'good first issue' bugs, adding small well-defined features, writing new test cases, or minor refactorings. Helps user deepen technical skills.
+        3. **Advanced/Expert:** Focus on complex tasks like designing/implementing major new features, performance optimization, architecture improvements, or security enhancements. Requires deep project knowledge.)
 
 Survey Responses:
 - Q1. Reason for contributing to open source: ${answers.reason}
@@ -326,16 +302,19 @@ Output Format (Strictly follow this JSON array structure):
     "GoodFirstIssue": true,
     "ContributionDirections": [
       {
+        "number": 1,
         "title": "Documentation Enhancement",
-        "description": "Improve existing documentation by adding code examples, clarifying setup instructions, and creating beginner-friendly tutorials for new contributors."
+        "description": "Start by improving existing documentation - fix typos, add missing examples, or clarify confusing explanations. This requires minimal setup and helps you understand the project structure."
       },
       {
+        "number": 2,
         "title": "Bug Fixing",
-        "description": "Identify and fix beginner-friendly bugs labeled as 'good first issue', focusing on issues related to UI components or data validation."
+        "description": "Identify and fix beginner-friendly bugs labeled as 'good first issue', focusing on issues related to UI components or data validation that match your skill level."
       },
       {
-        "title": "Testing",
-        "description": "Write comprehensive unit tests for core functionalities, especially for newly added features that lack test coverage."
+        "number": 3,
+        "title": "Feature Development",
+        "description": "After gaining familiarity with the codebase, contribute to new feature development by implementing small, well-defined enhancements that align with your technical strengths."
       }
     ]
   }
@@ -343,7 +322,6 @@ Output Format (Strictly follow this JSON array structure):
 `;
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    // It's generally good practice to specify a temperature if you want more (or less) creative output
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite', generationConfig: { temperature: 0.7 } });
     const result = await model.generateContent(prompt);
 
@@ -353,7 +331,6 @@ Output Format (Strictly follow this JSON array structure):
     }
 
     const text = result.response.text();
-    // Clean JSON string by removing markdown backticks
     const jsonString = text.replace(/```json\n|```/g, '').trim();
     logger.info('Gemini API response for recommendations:', jsonString);
 
