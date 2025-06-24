@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { analyzeUserOpenSourceProfile, OpenSourceRecommendation, analyzeGitRepoProfile } from '../services/geminiService';
 import logger from '../utils/logger';
 import OpenSourceSurvey from '../models/OpenSourceSurvey';
+import RepoAnalysisResult from '../models/RepoAnalysisResult';
+import Recommendation from '../models/Recommendation';
 
 
 // Extract required fields from the schema dynamically
@@ -67,24 +69,37 @@ export const getOpenSourceRecommendations = async (req: Request, res: Response):
 
         logger.info('Open source recommendations generated successfully.');
 
-        // Save survey data AND recommendations to DB (upsert to avoid duplicate userId error)
+        // Save only survey data to DB (no recommendations field)
         try {
             await OpenSourceSurvey.updateOne(
-                { userId }, // Filter by userId
-                { $set: { ...answers, userId, recommendations } }, // Include recommendations field in the set operation
-                { upsert: true } // Create new document if userId not found, otherwise update
+                { userId },
+                { $set: { ...answers, userId } },
+                { upsert: true }
             );
-            logger.info('Survey data and recommendations upserted to DB');
+            logger.info('Survey data upserted to DB');
         } catch (dbErr: any) {
-            logger.error('Failed to save survey data and recommendations to DB:', dbErr);
-            // Decide how to handle DB save failure:
-            // - You might want to return an error to the client here if DB save is critical.
-            // - Current logic continues to send recommendations to the client even if DB save fails.
+            logger.error('Failed to save survey data to DB:', dbErr);
         }
 
-        // RepoAnalysisResult 모델 import
-        const RepoAnalysisResultModel = (await import('../models/RepoAnalysisResult')).default;
-        // repoAnalyses를 userId와 함께 DB에 upsert (bulkWrite)
+        // Save recommendations to Recommendation collection (bulk upsert)
+        if (recommendations && recommendations.length > 0) {
+            const recBulkOps = recommendations.map((rec) => ({
+                updateOne: {
+                    filter: { userId, RepoURL: rec.RepoURL },
+                    update: { $set: { ...rec, userId } },
+                    upsert: true
+                }
+            }));
+            try {
+                await Recommendation.bulkWrite(recBulkOps);
+                logger.info('Recommendations upserted to Recommendation collection');
+            } catch (recDbErr: any) {
+                logger.error('Failed to upsert recommendations:', recDbErr);
+            }
+        }
+
+        // import RepoAnalysisResult model
+        // 이미 상단에서 import RepoAnalysisResult from '../models/RepoAnalysisResult';
         if (repoAnalyses && repoAnalyses.length > 0) {
             const bulkOps = repoAnalyses.map((analysis, idx) => ({
                 updateOne: {
@@ -94,7 +109,7 @@ export const getOpenSourceRecommendations = async (req: Request, res: Response):
                 }
             }));
             try {
-                await RepoAnalysisResultModel.bulkWrite(bulkOps);
+                await RepoAnalysisResult.bulkWrite(bulkOps);
                 logger.info('Repo analysis results upserted to RepoAnalysisResult collection');
             } catch (repoDbErr: any) {
                 logger.error('Failed to upsert repo analysis results:', repoDbErr);
