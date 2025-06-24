@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chatbot</title>
+    <style>
+        /* Basic CSS for a chat interface */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+        }
+        .chat-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 450px;
+            max-width: 90%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .chat-messages {
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            border-bottom: 1px solid #eee;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            max-width: 80%;
+        }
+        .user-message {
+            background-color: #e1ffc7;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        .bot-message {
+            background-color: #f1f0f0;
+            align-self: flex-start;
+            margin-right: auto;
+        }
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            gap: 10px;
+        }
+        .chat-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .chat-input button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .chat-input button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot-message">Hello! How can I assist you today?</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+
+        const BACKEND_API_URL = 'http://localhost:3001/api/chatbot/message';
+
+        function addMessage(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll to bottom
+            return messageDiv; // <-- 중요: 추가된 메시지 엘리먼트를 반환하도록 수정
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return; // Don't send empty messages
+
+            addMessage('user', message); // Display user's message immediately
+            userInput.value = ''; // Clear input field
+
+            let typingIndicator; // typingIndicator 변수를 try 블록 밖에서 선언
+            try {
+                // Simulate typing indicator (optional, for better UX)
+                typingIndicator = addMessage('bot', 'Typing...'); // Placeholder for bot's response
+                
+                const response = await fetch(BACKEND_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message }),
+                });
+
+                if (!response.ok) {
+                    // HTTP 상태 코드가 200번대가 아닐 경우
+                    const errorText = await response.text(); // 오류 응답 본문 확인
+                    throw new Error(`HTTP error! Status: ${response.status}, Details: ${errorText}`);
+                }
+
+                const data = await response.json();
+                
+                // 받은 데이터가 예상하는 success: true, response: "..." 형태인지 확인
+                if (data.success === true && typeof data.response === 'string') {
+                    typingIndicator.textContent = data.response; // 실제 봇 응답으로 변경
+                } else {
+                    // 백엔드가 200 OK를 보냈지만, JSON 내용이 예상과 다를 경우
+                    console.warn('Backend response structure unexpected:', data);
+                    typingIndicator.textContent = 'Sorry, the AI response was unexpected.';
+                }
+
+            } catch (error) {
+                console.error('Error sending message:', error);
+                // `typingIndicator`가 이미 추가되었다면, 그 내용을 변경
+                if (typingIndicator) {
+                    typingIndicator.textContent = 'Oops! Something went wrong. Please try again.';
+                    typingIndicator.classList.add('bot-message'); // 스타일 재확보
+                } else {
+                    // `typingIndicator`가 추가되기 전에 오류가 났다면, 새 메시지 추가
+                    addMessage('bot', 'Oops! Something went wrong. Please try again.');
+                }
+            }
+        }
+
+        // Event listeners for send button click and Enter key press
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
