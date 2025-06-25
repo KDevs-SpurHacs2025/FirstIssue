@@ -1,11 +1,34 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import logger from '../utils/logger'; // Assuming you have a logger utility
-import OpenSourceSurvey, { IOpenSourceSurvey } from '../models/OpenSourceSurvey';
-import RepoAnalysisResult, { IRepoAnalysisResult } from '../models/RepoAnalysisResult';
-import Recommendation, { IRecommendation } from '../models/Recommendation';
+import logger from '../utils/logger.js';
+import OpenSourceSurvey, { IOpenSourceSurvey } from '../models/OpenSourceSurvey.js';
+import RepoAnalysisResult from '../models/RepoAnalysisResult.js';
+import Recommendation, { IRecommendation } from '../models/Recommendation.js';
 
-// --- Type Definitions for AI Analysis ---
+// --- Type Definitions for AI Analysis (서비스 레이어용 Plain Object 타입) ---
 export type SkillLevel = "Novice" | "Beginner" | "Intermediate" | "Advanced" | "Expert";
+
+export interface RepoAnalysisResult {
+  devDirection: string;
+  languages: { name: string; skill: SkillLevel }[];
+  frameworks: { name: string; skill: SkillLevel }[];
+  packages: { name: string; skill: SkillLevel }[];
+  habits: { strengths: string[]; improvements: string[] };
+  overallSkillLevel: SkillLevel;
+  error?: string;
+  detail?: string;
+  rawGeminiResponse?: string;
+  repoUrl: string;
+}
+
+export type UserSurveyAnswers = Omit<IOpenSourceSurvey, 'userId' | 'createdAt' | '_id' | '__v'>;
+
+export interface ContributionDirection {
+  number: number;
+  title: string;
+  description: string;
+}
+
+export type OpenSourceRecommendation = Omit<IRecommendation, 'userId' | 'createdAt' | '_id' | '__v'>;
 
 // --- Helper function to get current date in YYYY-MM-DD format ---
 function getTodayDateString(): string {
@@ -27,7 +50,7 @@ function getTodayDateString(): string {
 export async function analyzeGitRepoProfile(
   repoUrl: string,
   repoType?: string
-): Promise<IRepoAnalysisResult & { repoUrl: string }> {
+): Promise<RepoAnalysisResult & { repoUrl: string }> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     logger.error('Error: GEMINI_API_KEY is not set in environment variables for repo analysis.');
@@ -88,7 +111,7 @@ Return the result as a JSON object with the following structure:
     const jsonString = text.replace(/```json\n|```/g, '').trim();
     logger.info(`Gemini API response for ${repoUrl}:`, jsonString);
 
-    let analysis: IRepoAnalysisResult;
+    let analysis: RepoAnalysisResult;
     try {
       analysis = JSON.parse(jsonString);
     } catch (parseError: any) {
@@ -124,9 +147,9 @@ Return the result as a JSON object with the following structure:
  * @returns A JSON object containing success status and a list of recommended open-source projects.
  */
 export async function analyzeUserOpenSourceProfile(
-  answers: IOpenSourceSurvey,
-  repoAnalyses: (IRepoAnalysisResult & { repoUrl: string })[]
-): Promise<{ success: boolean; recommendations: IRecommendation[] } | { error: string; detail: string; rawResponse?: string }> {
+  answers: UserSurveyAnswers,
+  repoAnalyses: (RepoAnalysisResult & { repoUrl: string })[]
+): Promise<{ success: boolean; recommendations: OpenSourceRecommendation[] } | { error: string; detail: string; rawResponse?: string }> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     logger.error('Error: GEMINI_API_KEY is not set in environment variables.');
@@ -289,11 +312,11 @@ Output Format (Strictly follow this JSON array structure):
     const jsonString = text.replace(/```json\n|```/g, '').trim();
     logger.info('Gemini API response for recommendations:', jsonString);
 
-    let analysis: { success: boolean; recommendations: IRecommendation[] };
+    let analysis: { success: boolean; recommendations: OpenSourceRecommendation[] };
     try {
       analysis = {
-        success: true, // Assuming success if parsing is successful
-        recommendations: JSON.parse(jsonString) as IRecommendation[] // Cast to array of recommendations
+        success: true,
+        recommendations: JSON.parse(jsonString) as OpenSourceRecommendation[]
       };
     } catch (parseError: any) {
       logger.error('Failed to parse Gemini API response as JSON for recommendations:', parseError);

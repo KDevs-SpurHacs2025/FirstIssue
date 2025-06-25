@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
-import logger from '../utils/logger'; // Assuming you have this logger utility
+import logger from '../utils/logger.js'; // Assuming you have this logger utility
 
 // Load environment variables (dotenv will look for .env in the current working directory)
 dotenv.config();

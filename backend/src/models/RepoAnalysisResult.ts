@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { SkillLevel } from '../services/geminiService';
+import { SkillLevel } from '../services/geminiService.js';
 
 export interface IRepoAnalysisResult extends Document {
   userId: string;
