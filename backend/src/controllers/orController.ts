@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { analyzeUserOpenSourceProfile, OpenSourceRecommendation, analyzeGitRepoProfile } from '../services/geminiService';
-import logger from '../utils/logger';
-import OpenSourceSurvey from '../models/OpenSourceSurvey';
-import RepoAnalysisResult from '../models/RepoAnalysisResult';
-import Recommendation from '../models/Recommendation';
+import { analyzeUserOpenSourceProfile, OpenSourceRecommendation, analyzeGitRepoProfile } from '../services/geminiService.js';
+import logger from '../utils/logger.js';
+import OpenSourceSurvey from '../models/OpenSourceSurvey.js';
+import RepoAnalysisResult from '../models/RepoAnalysisResult.js';
+import Recommendation from '../models/Recommendation.js';
 
 
 // Extract required fields from the schema dynamically

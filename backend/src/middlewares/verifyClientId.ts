@@ -1,5 +1,5 @@
 import express from 'express';
-import Client from '../models/Client';
+import Client from '../models/Client.js';
 
 const clientIdStore = new Map<string, number>(); // clientId -> expiration time (timestamp)
 const CLIENT_ID_TTL_MS = 60 * 60 * 1000; // 1 hour
