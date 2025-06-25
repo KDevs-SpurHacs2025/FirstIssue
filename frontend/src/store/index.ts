@@ -3,15 +3,17 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { combineReducers } from "@reduxjs/toolkit";
 import userSlice from "./slices/userSlice";
+import surveySlice from "./slices/surveySlice";
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user"], // Store the userId in to localStorage
+  whitelist: ["user", "survey"], // userId와 survey 데이터 모두 localStorage에 저장
 };
 
 const rootReducer = combineReducers({
   user: userSlice,
+  survey: surveySlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
