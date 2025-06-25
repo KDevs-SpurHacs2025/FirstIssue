@@ -4,6 +4,7 @@ import storage from "redux-persist/lib/storage";
 import { combineReducers } from "@reduxjs/toolkit";
 import userSlice from "./slices/userSlice";
 import surveySlice from "./slices/surveySlice";
+import recommendationSlice from "./slices/recommendationSlice";
 
 const persistConfig = {
   key: "root",
@@ -14,6 +15,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   user: userSlice,
   survey: surveySlice,
+  recommendation: recommendationSlice, // recommendation은 세션 스토리지에만 저장
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

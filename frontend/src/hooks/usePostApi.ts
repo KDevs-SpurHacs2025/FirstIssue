@@ -4,7 +4,10 @@ export const usePostApi = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const post = async <T = unknown>(url: string, data: Record<string, unknown>): Promise<T> => {
+  const post = async <T = unknown>(
+    url: string,
+    data: Record<string, unknown>
+  ): Promise<T> => {
     setIsLoading(true);
     setError(null);
 

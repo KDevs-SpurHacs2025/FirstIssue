@@ -15,6 +15,12 @@ import {
   setPastLinks,
   completeSurvey,
 } from "../store/slices/surveySlice";
+import {
+  setRepositories,
+  setLoading,
+  setError,
+  clearRecommendations,
+} from "../store/slices/recommendationSlice";
 
 const Survey = () => {
   const navigate = useNavigate();
@@ -58,18 +64,31 @@ const Survey = () => {
       "CLI Tool": "cli",
       "API/Backend": "backend",
       Other: "other",
-    };
-
-    // contribCount를 숫자로 변환
+    }; // contribCount를 숫자로 변환
     const experienceMapping: { [key: string]: number } = {
       Never: 0,
       "1–2 times": 1,
       "3–5 times": 3,
       "More than 5 times": 6,
     };
+
+    // howContribute 옵션을 간단한 키워드로 매핑
+    const contributionMapping: { [key: string]: string } = {
+      "Code contributions (bug fixes, refactoring, performance improvements, writing test code)":
+        "Code contributions",
+      "Documentation (fixing typos, improving grammar, writing API docs, adding tutorials or guides)":
+        "Documentation",
+      "Design & UI/UX (logos, icons, visual assets)": "Design & UI/UX",
+      "Testing & Reviewing (reviewing PRs, testing projects, giving feedback)":
+        "Testing & Reviewing",
+    };
+
     return {
       userId: testUserId,
       reason: whyContribute,
+      ContributionDirections: howContribute.map(
+        (option) => contributionMapping[option] || option
+      ), // 매핑된 간단한 키워드로 변환
       publicRepos: proudProject ? [proudProject] : [],
       repoTypes: proudProjectType
         ? [repoTypeMapping[proudProjectType] || "other"]
@@ -137,20 +156,66 @@ const Survey = () => {
     e.preventDefault();
 
     try {
+      // 로딩 상태 시작
+      dispatch(setLoading(true));
+      dispatch(clearRecommendations());
+
       // Redux 상태를 API 형태로 변환
       const apiData = transformToApiFormat();
 
       // 변환된 데이터 로그 (개발용)
-      console.log("📤 Sending to API:", apiData);
-
-      // usePostApi 훅을 사용한 API 호출
+      console.log("📤 Sending to API:", apiData); // usePostApi 훅을 사용한 API 호출
       const result = await post("/generate/recommendations", apiData);
       console.log("📥 API Response:", result);
 
+      // API 응답을 Redux에 저장
+      // 네트워크 탭에서 보이는 중첩 구조 처리: result.recommendations.recommendations
+      if (
+        result &&
+        (result as any).recommendations &&
+        (result as any).recommendations.recommendations
+      ) {
+        // 백엔드 응답 형태를 프론트엔드 Repository 형태로 변환
+        const transformedRepos = (
+          result as any
+        ).recommendations.recommendations.map((repo: any, index: number) => ({
+          id: index + 1,
+          name: repo["Repo Name"] || repo.name || repo.repoName || "Unknown",
+          fullName:
+            repo["Repo Name"] || repo.fullName || repo.name || "Unknown",
+          description: repo["Short Description"] || repo.description || "",
+          language:
+            (repo["Languages/Frameworks"] && repo["Languages/Frameworks"][0]) ||
+            repo.language ||
+            (repo.languages && repo.languages[0]) ||
+            "Unknown",
+          stars: repo.stars || repo.stargazers_count || 0,
+          forks: repo.forks || repo.forks_count || 0,
+          issues: repo.issues || repo.open_issues_count || 0,
+          url: repo["Repo URL"] || repo.url || repo.html_url || "",
+          goodFirstIssues: repo.goodFirstIssues || 0,
+          lastActivity:
+            repo["Latest Updated Date"] ||
+            repo.lastActivity ||
+            repo.updated_at ||
+            new Date().toISOString(),
+          difficulty:
+            repo["Difficulties"] || repo.difficulty || ("beginner" as const),
+        }));
+
+        dispatch(setRepositories(transformedRepos));
+        console.log("✅ Repositories saved to Redux:", transformedRepos);
+      } else {
+        console.warn("⚠️ No recommendations found in API response");
+      }
+
+      dispatch(setLoading(false));
       dispatch(completeSurvey());
       navigate("/opensource-list");
     } catch (error) {
       console.error("❌ API Error:", error);
+      dispatch(setError("서버 오류가 발생했습니다. 다시 시도해주세요."));
+      dispatch(setLoading(false));
       // 에러 처리 - 사용자에게 알림
       alert("서버 오류가 발생했습니다. 다시 시도해주세요.");
     }
