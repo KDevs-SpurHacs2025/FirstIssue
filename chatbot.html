@@ -92,30 +92,37 @@
         function addMessage(sender, text) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
-            messageDiv.textContent = text;
+            // HTML 태그 및 마크다운 굵게(**) 지원
+            messageDiv.innerHTML = text
+                .replace(/\n/g, '<br>')
+                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll to bottom
             return messageDiv; // <-- 중요: 추가된 메시지 엘리먼트를 반환하도록 수정
         }
+
+        // --- userId와 Rank를 하드코딩 값으로 설정 ---
+        const HARDCODED_USER_ID = "7bfb2b89-9cad-478d-8564-af26bf593dae"; // 원하는 값으로 변경
+        const HARDCODED_RANK = 1; // 원하는 값으로 변경
 
         async function sendMessage() {
             const message = userInput.value.trim();
             if (!message) return; // Don't send empty messages
 
             addMessage('user', message); // Display user's message immediately
-            userInput.value = ''; // Clear input field
+            userInput.value = '';
 
-            let typingIndicator; // typingIndicator 변수를 try 블록 밖에서 선언
+            let typingIndicator;
             try {
-                // Simulate typing indicator (optional, for better UX)
-                typingIndicator = addMessage('bot', 'Typing...'); // Placeholder for bot's response
-                
+                typingIndicator = addMessage('bot', 'Typing...');
+                // --- body에 하드코딩된 userId, rank 포함 ---
+                const body = { message, userId: HARDCODED_USER_ID, rank: HARDCODED_RANK };
                 const response = await fetch(BACKEND_API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ message: message }),
+                    body: JSON.stringify(body),
                 });
 
                 if (!response.ok) {
