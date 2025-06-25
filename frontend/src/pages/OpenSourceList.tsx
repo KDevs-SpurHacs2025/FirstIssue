@@ -13,7 +13,10 @@ import {
   setLoading,
   clearRecommendations,
 } from "../store/slices/recommendationSlice";
-
+import Footer from "../components/Footer";
+import GradientButton from "../components/GradientButton";
+import { emptyIconDrawMotion } from "../animations/listAnimation";
+import { motion } from "framer-motion";
 // OpenSourceList Component
 const OpenSourceList = () => {
   const navigate = useNavigate();
@@ -215,9 +218,10 @@ const OpenSourceList = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
+    <div className="w-full h-auto bg-bg-black pt-[120px]">
+      {/* Navbar and Header */}
       <Navbar />
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 ">
         <h1 className="text-2xl font-bold">
           Open Source Project Recommendations
         </h1>
@@ -228,37 +232,39 @@ const OpenSourceList = () => {
         >
           {isLoading || apiLoading ? "Loading..." : "Regenerate"}
         </button>
-      </div>{" "}
+      </div> 
+      {/* No repository page */}
       {repositories.length === 0 && (
-        <div className="text-center py-12">
-          <div className="mb-6">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
+        <div className="text-center py-48">
+          <div className="mb-4">
+ <svg
+        className="mx-auto h-12 w-12 text-gray-400"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <motion.path
+          {...emptyIconDrawMotion}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+        />
+      </svg>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <h3 className="text-2xl font-medium text-white mb-2">
             No recommendations yet
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="text-text-gray-light text-sm mb-6">
             Complete the survey to get personalized open source project
-            recommendations tailored to your interests and experience level.
+            recommendations
           </p>
-          <button
-            onClick={() => navigate("/survey")}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Take Survey
-          </button>
+            <GradientButton
+              onClick={() => navigate("/survey")}
+              className="px-6 py-2 rounded-lg text-white font-semibold transition-transform hover:scale-105"
+            >
+              Take Survey
+            </GradientButton>
         </div>
       )}{" "}
       {repositories.length > 0 &&
@@ -276,6 +282,8 @@ const OpenSourceList = () => {
             url={card.url}
           />
         ))}
+      {/* Footer */}
+        <Footer />
     </div>
   );
 };
