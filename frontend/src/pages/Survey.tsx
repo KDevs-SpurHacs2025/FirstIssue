@@ -2,10 +2,9 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useSurvey, useAppDispatch, useUser } from "../hooks/useRedux";
 import { usePostApi } from "../hooks/usePostApi";
-import DebugPanel from "../components/DebugPanel";
 import Navbar from "../components/Navbar";
-import ClearIcon from '@mui/icons-material/Clear';
-import AddIcon from '@mui/icons-material/Add';
+import ClearIcon from "@mui/icons-material/Clear";
+import AddIcon from "@mui/icons-material/Add";
 import GradientButton from "../components/GradientButton";
 import {
   setWhyContribute,
@@ -32,6 +31,7 @@ import Footer from "../components/Footer";
 import LinearProgress from '@mui/material/LinearProgress';
 import LoadingScreen from "../components/LoadingScreen";
 
+
 // Classes for consistent styling
 const questionBlockClass =
   "p-8 rounded-2xl bg-blue-light border border-blue-900/30 shadow-xl shadow-blue-900/10 transition-transform question-block";
@@ -44,34 +44,33 @@ const iconButtonClass =
 const addButtonClass =
   "bg-white px-3 py-2 rounded flex items-center justify-center mt-3 transition-transform hover:scale-105 text-sm";
 
-   // Options
-  const whyOptions = [
-    "I want to contribute using the languages or frameworks I'm confident in.",
-    "I want to learn new programming languages or frameworks through contribution.",
-    "I want to contribute to a specific open-source project I like",
-  ];
-  const howOptions = [
-    "Code contributions (bug fixes, refactoring, performance improvements, writing test code)",
-    "Documentation (fixing typos, improving grammar, writing API docs, adding tutorials or guides)",
-    "Design & UI/UX (logos, icons, visual assets)",
-    "Testing & Reviewing (reviewing PRs, testing projects, giving feedback)",
-  ];
-  const contribCountOptions = [
-    "Never",
-    "1–2 times",
-    "3–5 times",
-    "More than 5 times",
-  ];
-  const proudProjectTypeOptions = [
-    "Web App",
-    "Mobile App",
-    "Desktop App",
-    "Library",
-    "CLI Tool",
-    "API/Backend",
-    "Other",
-  ];
-  
+// Options
+const whyOptions = [
+  "I want to contribute using the languages or frameworks I'm confident in.",
+  "I want to learn new programming languages or frameworks through contribution.",
+  "I want to contribute to a specific open-source project I like",
+];
+const howOptions = [
+  "Code contributions (bug fixes, refactoring, performance improvements, writing test code)",
+  "Documentation (fixing typos, improving grammar, writing API docs, adding tutorials or guides)",
+  "Design & UI/UX (logos, icons, visual assets)",
+  "Testing & Reviewing (reviewing PRs, testing projects, giving feedback)",
+];
+const contribCountOptions = [
+  "Never",
+  "1–2 times",
+  "3–5 times",
+  "More than 5 times",
+];
+const proudProjectTypeOptions = [
+  "Web App",
+  "Mobile App",
+  "Desktop App",
+  "Library",
+  "CLI Tool",
+  "API/Backend",
+  "Other",
+];
 
 const Survey = () => {
   const navigate = useNavigate();
@@ -153,7 +152,7 @@ const Survey = () => {
       experiencedUrls: pastLinks.filter((url) => url.trim() !== ""),
     };
   };
- 
+
   // Redux 액션을 사용한 핸들러들
   const handleCheckboxToggle = (
     value: string,
@@ -322,7 +321,7 @@ const Survey = () => {
 
   // Reset user's scroll position
   React.useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, []);
 
   // Loading Screen 
@@ -333,6 +332,7 @@ if (apiLoading) {
     />
   );
 }
+
 
   return (
     <div className="bg-bg-black w-full min-h-screen">
@@ -346,7 +346,8 @@ if (apiLoading) {
             Help Us Find Your Perfect Open Source Match
           </h1>
           <p className="text-md text-text-gray text-center">
-            Answer a few questions to get personalized repository recommendations
+            Answer a few questions to get personalized repository
+            recommendations
           </p>
           <div className="flex flex-col gap-12 mt-20">
             {/* 1. Why do you want to contribute? */}
@@ -355,13 +356,21 @@ if (apiLoading) {
               className={questionBlockClass}
               aria-labelledby="why-label"
             >
-              <label id="why-label" className="font-semibold text-white mb-4 block text-base flex items-center gap-2">
-                <span role="img" aria-label="lightbulb">💡</span>
+              <label
+                id="why-label"
+                className="font-semibold text-white mb-4 block text-base flex items-center gap-2"
+              >
+                <span role="img" aria-label="lightbulb">
+                  💡
+                </span>
                 1. Why do you want to contribute to open source?
               </label>
               <div className="flex flex-col gap-3 mt-2">
                 {whyOptions.map((option) => (
-                  <label key={option} className="flex items-center gap-3 text-sm text-text-gray-light">
+                  <label
+                    key={option}
+                    className="flex items-center gap-3 text-sm text-text-gray-light"
+                  >
                     <input
                       type="radio"
                       name="whyContribute"
@@ -381,18 +390,30 @@ if (apiLoading) {
               className={questionBlockClass}
               aria-labelledby="how-label"
             >
-              <label id="how-label" className="font-semibold text-white mb-4 block text-base flex items-center gap-2">
-                <span role="img" aria-label="tools">🛠️</span>
+              <label
+                id="how-label"
+                className="font-semibold text-white mb-4 block text-base flex items-center gap-2"
+              >
+                <span role="img" aria-label="tools">
+                  🛠️
+                </span>
                 2. How do you want to contribute? (Select all that apply)
               </label>
               <div className="flex flex-col gap-3 mt-2">
                 {howOptions.map((option) => (
-                  <label key={option} className="flex items-center gap-3 text-text-gray-light text-sm">
+                  <label
+                    key={option}
+                    className="flex items-center gap-3 text-text-gray-light text-sm"
+                  >
                     <input
                       type="checkbox"
                       checked={howContribute.includes(option)}
                       onChange={() =>
-                        handleCheckboxToggle(option, howContribute, setHowContribute)
+                        handleCheckboxToggle(
+                          option,
+                          howContribute,
+                          setHowContribute
+                        )
                       }
                       className="accent-blue-600 focus:outline-none"
                     />
@@ -407,19 +428,33 @@ if (apiLoading) {
               className={questionBlockClass}
               aria-labelledby="proud-label"
             >
-              <label id="proud-label" className="font-semibold text-white mb-4 block text-base flex items-center gap-2">
-                <span role="img" aria-label="trophy">🏆</span>
-                3. Tell us about your proudest project or your representative public repo. (Optional)
+              <label
+                id="proud-label"
+                className="font-semibold text-white mb-4 block text-base flex items-center gap-2"
+              >
+                <span role="img" aria-label="trophy">
+                  🏆
+                </span>
+                3. Tell us about your proudest project or your representative
+                public repo. (Optional)
               </label>
               <div className="flex flex-row gap-4 mt-2">
                 <select
                   className={selectClass}
                   value={proudProjectType}
-                  onChange={(e) => dispatch(setProudProjectType(e.target.value))}
+                  onChange={(e) =>
+                    dispatch(setProudProjectType(e.target.value))
+                  }
                 >
-                  <option value="" className="text-text-gray bg-bg-black">Type</option>
+                  <option value="" className="text-text-gray bg-bg-black">
+                    Type
+                  </option>
                   {proudProjectTypeOptions.map((opt) => (
-                    <option key={opt} value={opt} className="text-text-gray bg-bg-black">
+                    <option
+                      key={opt}
+                      value={opt}
+                      className="text-text-gray bg-bg-black"
+                    >
                       {opt}
                     </option>
                   ))}
@@ -439,8 +474,13 @@ if (apiLoading) {
               className={questionBlockClass}
               aria-labelledby="confident-label"
             >
-              <label id="confident-label" className="font-semibold text-white mb-4 block text-base flex items-center gap-2">
-                <span role="img" aria-label="rocket">🚀</span>
+              <label
+                id="confident-label"
+                className="font-semibold text-white mb-4 block text-base flex items-center gap-2"
+              >
+                <span role="img" aria-label="rocket">
+                  🚀
+                </span>
                 4. Languages or frameworks you’re confident in:
               </label>
               <input
@@ -450,7 +490,9 @@ if (apiLoading) {
                 value={confidentLangs.join(", ")}
                 onChange={(e) =>
                   dispatch(
-                    setConfidentLangs(e.target.value.split(",").map((s) => s.trim()))
+                    setConfidentLangs(
+                      e.target.value.split(",").map((s) => s.trim())
+                    )
                   )
                 }
               />
@@ -461,8 +503,13 @@ if (apiLoading) {
               className={questionBlockClass}
               aria-labelledby="enjoy-label"
             >
-              <label id="enjoy-label" className="font-semibold text-white mb-4 block text-base flex items-center gap-2">
-                <span role="img" aria-label="heart">❤️</span>
+              <label
+                id="enjoy-label"
+                className="font-semibold text-white mb-4 block text-base flex items-center gap-2"
+              >
+                <span role="img" aria-label="heart">
+                  ❤️
+                </span>
                 5. Languages or frameworks you enjoy using:
               </label>
               <input
@@ -472,7 +519,9 @@ if (apiLoading) {
                 value={enjoyLangs.join(", ")}
                 onChange={(e) =>
                   dispatch(
-                    setEnjoyLangs(e.target.value.split(",").map((s) => s.trim()))
+                    setEnjoyLangs(
+                      e.target.value.split(",").map((s) => s.trim())
+                    )
                   )
                 }
               />
@@ -483,8 +532,13 @@ if (apiLoading) {
               className={questionBlockClass}
               aria-labelledby="learn-label"
             >
-              <label id="learn-label" className="font-semibold text-white mb-4 block text-base flex items-center gap-2">
-                <span role="img" aria-label="books">📚</span>
+              <label
+                id="learn-label"
+                className="font-semibold text-white mb-4 block text-base flex items-center gap-2"
+              >
+                <span role="img" aria-label="books">
+                  📚
+                </span>
                 6. Languages or frameworks you want to learn:
               </label>
               <input
@@ -494,7 +548,9 @@ if (apiLoading) {
                 value={learnLangs.join(", ")}
                 onChange={(e) =>
                   dispatch(
-                    setLearnLangs(e.target.value.split(",").map((s) => s.trim()))
+                    setLearnLangs(
+                      e.target.value.split(",").map((s) => s.trim())
+                    )
                   )
                 }
               />
@@ -505,8 +561,13 @@ if (apiLoading) {
               className={questionBlockClass}
               aria-labelledby="count-label"
             >
-              <label id="count-label" className="font-semibold text-white mb-4 block text-base flex items-center gap-2">
-                <span role="img" aria-label="repeat">🔁</span>
+              <label
+                id="count-label"
+                className="font-semibold text-white mb-4 block text-base flex items-center gap-2"
+              >
+                <span role="img" aria-label="repeat">
+                  🔁
+                </span>
                 7. How many times have you contributed to open source?
               </label>
               <select
@@ -514,9 +575,15 @@ if (apiLoading) {
                 value={contribCount}
                 onChange={(e) => dispatch(setContribCount(e.target.value))}
               >
-                <option value="" className="text-text-gray bg-bg-black">Select...</option>
+                <option value="" className="text-text-gray bg-bg-black">
+                  Select...
+                </option>
                 {contribCountOptions.map((opt) => (
-                  <option key={opt} value={opt} className="text-text-gray bg-bg-black">
+                  <option
+                    key={opt}
+                    value={opt}
+                    className="text-text-gray bg-bg-black"
+                  >
                     {opt}
                   </option>
                 ))}
@@ -528,9 +595,15 @@ if (apiLoading) {
               className={questionBlockClass}
               aria-labelledby="past-label"
             >
-              <label id="past-label" className="font-semibold text-white mb-4 block text-base flex items-center gap-2">
-                <span role="img" aria-label="link">🔗</span>
-                8. If you’ve contributed to open source before, please share links to your past contributions. (Optional — up to 5 links)
+              <label
+                id="past-label"
+                className="font-semibold text-white mb-4 block text-base flex items-center gap-2"
+              >
+                <span role="img" aria-label="link">
+                  🔗
+                </span>
+                8. If you’ve contributed to open source before, please share
+                links to your past contributions. (Optional — up to 5 links)
               </label>
               {pastLinks.map((link, idx) => (
                 <div key={idx} className="flex items-center gap-3 mt-2">
@@ -568,12 +641,14 @@ if (apiLoading) {
           </div>
           {/* Save Button */}
           <div className="flex justify-center w-full mt-10">
-            <GradientButton type="submit" className="px-14 py-2 text-lg font-medium transition-transform hover:scale-105" aria-label="Submit survey">
+            <GradientButton
+              type="submit"
+              className="px-14 py-2 text-lg font-medium transition-transform hover:scale-105"
+              aria-label="Submit survey"
+            >
               Save
             </GradientButton>
           </div>
-          {/* 개발용 디버깅 패널 */}
-          <DebugPanel />
         </form>
       </div>
       {/* Footer */}
