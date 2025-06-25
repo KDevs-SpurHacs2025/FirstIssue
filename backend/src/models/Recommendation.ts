@@ -42,7 +42,16 @@ const RecommendationSchema: Schema = new Schema(
       type: [
         {
           number: Number,
-          title: String,
+          title: {
+            type: String,
+            enum: [
+              'Code contributions',
+              'Documentation',
+              'Design & UI/UX',
+              'Testing & Reviewing'
+            ],
+            required: true
+          },
           description: String
         }
       ],
