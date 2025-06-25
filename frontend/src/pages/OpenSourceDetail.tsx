@@ -1,13 +1,13 @@
-import React from 'react'
+import { useParams, useNavigate } from "react-router-dom";
+import { useRecommendation } from "../hooks/useRedux";
+import Navbar from "../components/Navbar";
 
 const OpenSourceDetail = () => {
   return (
-    <div>
-      <h1>Open Source Project Details</h1>
-      <div>Action plans</div>
-      <div>Chatbot</div>
-     </div>
-  )
-}
+    <div className="w-full h-auto flex flex-col items-center bg-bg-black">
+      OpenSourceDetail
+    </div>
+  );
+};
 
-export default OpenSourceDetail
+export default OpenSourceDetail;

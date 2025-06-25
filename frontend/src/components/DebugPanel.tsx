@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useSurvey, useUser } from "../hooks/useRedux";
+import { useSurvey, useUser, useRecommendation } from "../hooks/useRedux";
 
 // 개발용 디버깅 패널 - production에서는 제거할 것
 const DebugPanel = () => {
   const [isVisible, setIsVisible] = useState(false);
   const surveyState = useSurvey();
   const userState = useUser();
+  const recommendationState = useRecommendation();
 
   // development 모드에서만 표시
   if (import.meta.env.PROD) {
@@ -24,21 +25,37 @@ const DebugPanel = () => {
       {isVisible && (
         <div className="mt-2 bg-gray-900 text-green-400 p-4 rounded-lg shadow-xl max-w-md max-h-96 overflow-auto text-xs font-mono">
           <h3 className="text-yellow-400 font-bold mb-2">Redux State</h3>
-
           <div className="mb-3">
             <h4 className="text-blue-400 font-semibold">User:</h4>
             <pre>{JSON.stringify(userState, null, 2)}</pre>
-          </div>
-
+          </div>{" "}
           <div>
             <h4 className="text-blue-400 font-semibold">Survey:</h4>
             <pre>{JSON.stringify(surveyState, null, 2)}</pre>
+          </div>
+          <div className="mt-3">
+            <h4 className="text-blue-400 font-semibold">
+              Recommendations ({recommendationState.repositories.length}):
+            </h4>
+            <pre>
+              {JSON.stringify(
+                recommendationState.repositories.slice(0, 2),
+                null,
+                2
+              )}
+            </pre>
+            {recommendationState.repositories.length > 2 && (
+              <p className="text-gray-400 text-xs">
+                ... and {recommendationState.repositories.length - 2} more
+              </p>
+            )}
           </div>
           <button
             onClick={() => {
               console.log("🔍 Full Redux State:", {
                 user: userState,
                 survey: surveyState,
+                recommendations: recommendationState,
               });
 
               // API 형태로 변환된 데이터도 로그 (Survey 페이지에서만)
