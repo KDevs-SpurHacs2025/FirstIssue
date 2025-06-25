@@ -17,9 +17,9 @@ const Navbar = () => {
         <DataObjectIcon color="primary" fontSize="medium" />
         <h1 className="text-xl font-bold italic ml-1">FirstIssue</h1>
       </Link>
-      {/* Navbar items only on home page */}
+      {/* Navbar items only on home page and not on mobile */}
       {isHome && (
-        <nav>
+        <nav className="hidden md:block">
           <ul className="flex flex-row items-center justify-center ml-4 gap-6">
             <li>
               <a href="#hero" className="text-xs hover:underline">

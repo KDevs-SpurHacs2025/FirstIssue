@@ -72,7 +72,7 @@ const Home = () => {
       {/* Hero Section */}
       <div
         id="hero"
-        className="w-full h-auto flex flex-col items-center justify-center text-center text-white mt-[60px] px-28 py-32"
+        className="w-full h-auto flex flex-col items-center justify-center text-center text-white mt-[60px] px-4 md:px-28 py-32"
         style={{ minHeight: "calc(100vh - 60px)" }}
       >
         <motion.h1
@@ -275,7 +275,7 @@ const Home = () => {
         className="w-full h-auto flex flex-col items-center justify-center text-white py-36 px-10"
       >
         <h2 className="text-3xl font-bold mb-1">
-          <span className="bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-transparent inline-block">
+          <span className="bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-center text-transparent inline-block">
             Ready
           </span>{" "}
           to Contribute to Open Source?
