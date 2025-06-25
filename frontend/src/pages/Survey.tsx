@@ -29,6 +29,7 @@ import {
 import { motion } from "framer-motion";
 import { questionBlockMotion } from "../animations/surveyAnimation";
 import Footer from "../components/Footer";
+import LinearProgress from '@mui/material/LinearProgress';
 
 // Classes for consistent styling
 const questionBlockClass =
@@ -327,11 +328,14 @@ const Survey = () => {
   if (apiLoading) {
     return (
       <div className="flex items-center justify-center h-screen w-screen bg-bg-black">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-xl font-semibold">
-            Loading your recommendations...
+        <div className="text-center w-full max-w-xs">
+          <p className="text-xl font-semibold text-white mb-1">
+            Finding repositories that match your interests...
           </p>
+          {/* <p className="text-sm text-text-gray">
+            This may take a few seconds. Thank you for your patience!
+          </p> */}
+           <LinearProgress color="primary" className="mt-4" />
         </div>
       </div>
     );
