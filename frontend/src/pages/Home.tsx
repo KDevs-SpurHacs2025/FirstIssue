@@ -50,7 +50,7 @@ const Home = () => {
     }
   };
   return (
-    <div className="w-full h-auto flex flex-col items-center">
+    <div className="w-full h-auto flex flex-col items-center bg-bg-black">
       <Navbar />
       {/* 에러 표시 */}
       {error && (
@@ -61,8 +61,8 @@ const Home = () => {
       {/* Hero Section */}
       <div
         id="hero"
-        className="scroll-mt-navbar w-full h-auto flex flex-col items-center justify-center bg-gray-700 text-center text-white px-28 py-32"
-        style={{ minHeight: "calc(100vh - 50px)" }}
+        className="w-full h-auto flex flex-col items-center justify-center text-center text-white mt-[60px] px-28 py-32"
+        style={{ minHeight: "calc(100vh - 60px)" }}
       >
         <h1 className="text-5xl font-bold mb-2">
           Find Your First GitHub Contribution
@@ -82,9 +82,9 @@ const Home = () => {
       {/* Section 1 */}
       <div
         id="discovery"
-        className="w-full h-auto flex flex-col items-center justify-center bg-gray-800 text-white px-10 py-20"
+        className="w-full h-auto flex flex-col items-center justify-center text-white px-10 py-20"
       >
-        <h2 className="text-xl font-bold mb-1">
+        <h2 className="text-3xl font-bold mb-1">
           Simple Repository Discovery
         </h2>
         <p className="text-sm mb-12">
@@ -136,9 +136,9 @@ const Home = () => {
       {/* Section 2*/}
       <div
         id="how-it-works"
-        className="w-full h-auto flex flex-col items-center justify-center bg-gray-900 text-white px-10 py-20"
+        className="w-full h-auto flex flex-col items-center justify-center text-white px-10 py-28"
       >
-        <h2 className="text-xl font-bold mb-1 text-center">How It Works</h2>
+        <h2 className="text-3xl font-bold mb-1 text-center">How It Works</h2>
         <p className="text-sm mb-10 text-center">
           Find and contribute to open source projects in just a few steps
         </p>
@@ -177,9 +177,9 @@ const Home = () => {
       {/* Section 3*/}
       <div
         id="ready"
-        className="w-full h-auto flex flex-col items-center justify-center bg-gray-800 text-white py-16 px-10"
+        className="w-full h-auto flex flex-col items-center justify-center text-white py-20 px-10"
       >
-        <h2 className="text-2xl font-bold mb-1">
+        <h2 className="text-3xl font-bold mb-1">
           Ready to Contribute to Open Source?
         </h2>
         <p className="text-base mb-4">
