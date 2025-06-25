@@ -1,6 +1,6 @@
 const Navbar = () => {
   return (
-    <div className="w-full h-[50px] flex flex-row items-center justify-between px-10 bg-gray-800 text-white">
+    <div className="fixed w-full h-[50px] flex flex-row items-center justify-between px-10 bg-gray-800 text-white">
       {/* Logo */}
       <div className="w-auto h-full flex flex-row items-center justify-center text-white">
         <img

@@ -50,29 +50,29 @@ const Home = () => {
     }
   };
   return (
-    <div>
+    <div className="w-full h-auto flex flex-col items-center">
       <Navbar />
       {/* 에러 표시 */}
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mx-4 mt-4">
+        <div className="fixed w-3/4 h-auto bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4">
           Error: {error}
         </div>
       )}{" "}
       {/* Hero Section */}
       <div
         id="hero"
-        className="w-full h-auto flex flex-col items-center justify-center bg-gray-700 text-center text-white"
+        className="scroll-mt-navbar w-full h-auto flex flex-col items-center justify-center bg-gray-700 text-center text-white px-28 py-32"
+        style={{ minHeight: "calc(100vh - 50px)" }}
       >
-        <h1 className="text-4xl font-bold">
+        <h1 className="text-5xl font-bold mb-2">
           Find Your First GitHub Contribution
         </h1>
-        <p>
-          Browse beginner-friendly GitHub repositories with issues tagged for
-          new contributors. Filter by programming language and difficulty level
-          to find the perfect project to contribute to.
+        <p className="text-sm">
+          Find beginner-friendly GitHub issues tailored to your skills and
+          experience
         </p>
         <button
-          className="mt-4 px-6 py-2 bg-blue-600 text-white rounded"
+          className="mt-10 px-6 py-2 bg-blue-600 text-white rounded"
           onClick={handleGetStarted}
           disabled={isLoading}
         >
@@ -82,43 +82,50 @@ const Home = () => {
       {/* Section 1 */}
       <div
         id="discovery"
-        className="w-full h-auto flex flex-col items-center justify-center bg-gray-800 text-white"
+        className="w-full h-auto flex flex-col items-center justify-center bg-gray-800 text-white px-10 py-20"
       >
-        <h2 className="text-3xl font-bold">Simple Repository Discovery</h2>
-        <p>Find GitHub repositories that welcome new contributors</p>
-        <div className="w-full h-auto flex flex-row items-center justify-center">
-          <div>
+        <h2 className="text-xl font-bold mb-1">
+          Simple Repository Discovery
+        </h2>
+        <p className="text-sm mb-12">
+          Find GitHub repositories that welcome new contributors
+        </p>
+        <div className="w-full flex flex-col md:flex-row items-stretch justify-center gap-x-6">
+          {/* Smart Filtering */}
+          <div className="bg-black text-white w-full md:w-1/3 h-full flex flex-col justify-center p-6 mb-6 md:mb-0 rounded-lg">
             <div>
-              <img />
+              <img src="" className="w-12 h-12 mb-6" />
             </div>
             <div>
-              <span>Smart Filtering</span>
-              <p>
+              <span className="text-md font-semibold mb-3">Smart Filtering</span>
+              <p className="text-sm font-base text-gray-200">
                 Filter repositories by programming language, issue labels, and
-                project activity to find excatly what you’re looking for
+                project activity to find exactly what you’re looking for
               </p>
             </div>
           </div>
-          <div>
+          {/* Beginner-Friendly */}
+          <div className="bg-black text-white w-full md:w-1/3 h-full flex flex-col justify-center p-6 mb-6 md:mb-0 rounded-lg">
             <div>
-              <img />
+              <img src="" className="w-12 h-12 mb-6" />
             </div>
             <div>
-              <span>Beginner-Friendly </span>
-              <p>
+              <span className="text-md font-semibold mb-3">Beginner-Friendly </span>
+              <p className="text-sm font-base text-gray-200">
                 Focus on repositories that have “good first issue”,
                 “beginner-friendly”, or “help wanted” labels for new
                 contributors
               </p>
             </div>
           </div>
-          <div>
+          {/* Project Information */}
+          <div className="bg-black text-white w-full md:w-1/3 h-full flex flex-col justify-center p-6 mb-6 md:mb-0 rounded-lg">
             <div>
-              <img />
+              <img src="" className="w-12 h-12 mb-6" />
             </div>
             <div>
-              <span>Project Information</span>
-              <p>
+              <span className="text-md font-semibold mb-3">Project Information</span>
+              <p className="text-sm font-base text-gray-200">
                 View repository details, contribution guidelines, and issue
                 descriptions to understand what you’ll be working on
               </p>
@@ -129,47 +136,53 @@ const Home = () => {
       {/* Section 2*/}
       <div
         id="how-it-works"
-        className="w-full h-auto flex flex-col items-center justify-center bg-gray-900 text-white"
+        className="w-full h-auto flex flex-col items-center justify-center bg-gray-900 text-white px-10 py-20"
       >
-        <div>
-          <h2 className="text-3xl font-bold text-center">How It Works</h2>
-          <p>Find and contribute to open source projects in just a few steps</p>
-        </div>
-        <div className="w-full h-auto flex flex-row items-center justify-center">
-          <div>
-            <span>Browse Projects</span>
-            <p>
+        <h2 className="text-xl font-bold mb-1 text-center">How It Works</h2>
+        <p className="text-sm mb-10 text-center">
+          Find and contribute to open source projects in just a few steps
+        </p>
+        <div className="w-full flex flex-col md:flex-row items-stretch justify-center gap-x-6 min-h-[220px]">
+          {/* Browse Projects */}
+          <div className="bg-blue-900 text-white w-full md:w-1/4 h-full flex flex-col items-center justify-center p-6 rounded-lg">
+            <span className="text-md font-semibold mb-3">Browse Projects</span>
+            <p className="text-sm font-base text-gray-200 text-center">
               Search through curated GitHub repositories that welcome new
               contributors
             </p>
           </div>
-          <div>
-            <span>Filter & Find</span>
-            <p>
+          {/* Filter & Find */}
+          <div className="bg-blue-800 text-white w-full md:w-1/4 h-full flex flex-col items-center justify-center p-6 rounded-lg">
+            <span className="text-md font-semibold mb-3">Filter & Find</span>
+            <p className="text-sm font-base text-gray-200 text-center">
               Use filters to find projects matching your skills and interests
             </p>
           </div>
-          <div>
-            <span>Read Guidelines</span>
-            <p>
+          {/* Read Guidelines */}
+          <div className="bg-blue-700 text-white w-full md:w-1/4 h-full flex flex-col items-center justify-center p-6 rounded-lg">
+            <span className="text-md font-semibold mb-3">Read Guidelines</span>
+            <p className="text-sm font-base text-gray-200 text-center">
               Review the project's contribution guidelines and issue details
             </p>
           </div>
-          <div>
-            <span>Start Contributing</span>
-            <p>Fork the repository and submit your first pull request</p>
+          {/* Start Contributing */}
+          <div className="bg-blue-600 text-white w-full md:w-1/4 h-full flex flex-col items-center justify-center p-6 rounded-lg">
+            <span className="text-md font-semibold mb-3">Start Contributing</span>
+            <p className="text-sm font-base text-gray-200 text-center">
+              Fork the repository and submit your first pull request
+            </p>
           </div>
         </div>
       </div>
-      {/* Section 3*/}{" "}
+      {/* Section 3*/}
       <div
         id="ready"
-        className="w-full h-auto flex flex-col items-center justify-center bg-gray-800 text-white"
+        className="w-full h-auto flex flex-col items-center justify-center bg-gray-800 text-white py-16 px-10"
       >
-        <h2 className="text-3xl font-bold">
+        <h2 className="text-2xl font-bold mb-1">
           Ready to Contribute to Open Source?
         </h2>
-        <p>
+        <p className="text-base mb-4">
           Start exploring GitHub repositories that are perfect for your first
           contribution
         </p>
