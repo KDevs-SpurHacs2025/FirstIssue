@@ -1,73 +1,92 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-interface SurveyAnswer {
-  questionId: string;
-  answer: string | string[];
-}
-
+// Survey 폼의 실제 상태 구조
 interface SurveyState {
-  answers: SurveyAnswer[];
-  currentStep: number;
-  totalSteps: number;
+  whyContribute: string;
+  howContribute: string[];
+  proudProject: string;
+  proudProjectType: string;
+  confidentLangs: string[];
+  enjoyLangs: string[];
+  learnLangs: string[];
+  contribCount: string;
+  pastLinks: string[];
   isCompleted: boolean;
-  completedAt: string | null;
+  loading: boolean;
 }
 
 const initialState: SurveyState = {
-  answers: [],
-  currentStep: 1,
-  totalSteps: 5, // 임시로 5개 단계
+  whyContribute: "",
+  howContribute: [],
+  proudProject: "",
+  proudProjectType: "",
+  confidentLangs: [],
+  enjoyLangs: [],
+  learnLangs: [],
+  contribCount: "",
+  pastLinks: [""],
   isCompleted: false,
-  completedAt: null,
+  loading: false,
 };
 
 const surveySlice = createSlice({
   name: "survey",
   initialState,
   reducers: {
-    setAnswer: (state, action: PayloadAction<SurveyAnswer>) => {
-      const existingIndex = state.answers.findIndex(
-        (answer) => answer.questionId === action.payload.questionId
-      );
-
-      if (existingIndex >= 0) {
-        state.answers[existingIndex] = action.payload;
-      } else {
-        state.answers.push(action.payload);
-      }
+    // 각 필드별 업데이트 - 팀원들이 이해하기 쉽게 명확한 이름 사용
+    setWhyContribute: (state, action: PayloadAction<string>) => {
+      state.whyContribute = action.payload;
     },
-    nextStep: (state) => {
-      if (state.currentStep < state.totalSteps) {
-        state.currentStep += 1;
-      }
+    setHowContribute: (state, action: PayloadAction<string[]>) => {
+      state.howContribute = action.payload;
     },
-    prevStep: (state) => {
-      if (state.currentStep > 1) {
-        state.currentStep -= 1;
-      }
+    setProudProject: (state, action: PayloadAction<string>) => {
+      state.proudProject = action.payload;
     },
-    setCurrentStep: (state, action: PayloadAction<number>) => {
-      state.currentStep = action.payload;
+    setProudProjectType: (state, action: PayloadAction<string>) => {
+      state.proudProjectType = action.payload;
     },
+    setConfidentLangs: (state, action: PayloadAction<string[]>) => {
+      state.confidentLangs = action.payload;
+    },
+    setEnjoyLangs: (state, action: PayloadAction<string[]>) => {
+      state.enjoyLangs = action.payload;
+    },
+    setLearnLangs: (state, action: PayloadAction<string[]>) => {
+      state.learnLangs = action.payload;
+    },
+    setContribCount: (state, action: PayloadAction<string>) => {
+      state.contribCount = action.payload;
+    },
+    setPastLinks: (state, action: PayloadAction<string[]>) => {
+      state.pastLinks = action.payload;
+    },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
+    },
+    // Survey 완료 처리
     completeSurvey: (state) => {
       state.isCompleted = true;
-      state.completedAt = new Date().toISOString();
     },
-    resetSurvey: (state) => {
-      state.answers = [];
-      state.currentStep = 1;
-      state.isCompleted = false;
-      state.completedAt = null;
+    // Survey 초기화 (개발/테스트용)
+    resetSurvey: () => {
+      return initialState;
     },
   },
 });
 
 export const {
-  setAnswer,
-  nextStep,
-  prevStep,
-  setCurrentStep,
+  setWhyContribute,
+  setHowContribute,
+  setProudProject,
+  setProudProjectType,
+  setConfidentLangs,
+  setEnjoyLangs,
+  setLearnLangs,
+  setContribCount,
+  setPastLinks,
+  setLoading,
   completeSurvey,
   resetSurvey,
 } = surveySlice.actions;

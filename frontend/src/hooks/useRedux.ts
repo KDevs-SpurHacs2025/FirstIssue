@@ -6,7 +6,11 @@ export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector = <T>(selector: (state: RootState) => T): T =>
   useSelector(selector);
 
-// 편의 hooks - 일단 user만
+// 편의 hooks
 export const useUser = () => {
   return useAppSelector((state) => state.user);
+};
+
+export const useSurvey = () => {
+  return useAppSelector((state) => state.survey);
 };
