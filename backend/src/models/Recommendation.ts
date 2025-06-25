@@ -52,4 +52,22 @@ const RecommendationSchema: Schema = new Schema(
   { timestamps: true }
 );
 
+export function mapRecommendationFields(jsonRec: any) {
+  return {
+    Rank: jsonRec["Rank"],
+    SuitabilityScore: jsonRec["Suitability Score"],
+    RepoName: jsonRec["Repo Name"],
+    RepoURL: jsonRec["Repo URL"],
+    CreatedDate: jsonRec["Created Date"],
+    LatestUpdatedDate: jsonRec["Latest Updated Date"],
+    LanguagesFrameworks: jsonRec["Languages/Frameworks"],
+    Difficulties: jsonRec["Difficulties"],
+    ShortDescription: jsonRec["Short Description"],
+    ReasonForRecommendation: jsonRec["ReasonForRecommendation"],
+    CurrentStatusDevelopmentDirection: jsonRec["CurrentStatusDevelopmentDirection"],
+    GoodFirstIssue: jsonRec["GoodFirstIssue"],
+    ContributionDirections: jsonRec["ContributionDirections"]
+  };
+}
+
 export default mongoose.model<IRecommendation>('Recommendation', RecommendationSchema);

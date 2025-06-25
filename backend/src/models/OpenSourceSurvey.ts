@@ -9,6 +9,7 @@ export interface IOpenSourceSurvey extends Document {
   wishToLearn: string[];
   numOfExperience: number;
   experiencedUrls: string[];
+  ContributionDirections: string[];
   createdAt?: Date;
 }
 
@@ -23,6 +24,16 @@ const OpenSourceSurveySchema: Schema = new Schema(
     wishToLearn: { type: [String] },
     numOfExperience: { type: Number },
     experiencedUrls: { type: [String] },
+    ContributionDirections: {
+      type: [String],
+      enum: [
+        'Code contributions',
+        'Documentation',
+        'Design & UI/UX',
+        'Testing & Reviewing',
+      ],
+      default: [],
+    },
   },
   { timestamps: true }
 );

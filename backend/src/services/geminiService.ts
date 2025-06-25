@@ -1,10 +1,10 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import logger from '../utils/logger.js';
-import OpenSourceSurvey, { IOpenSourceSurvey } from '../models/OpenSourceSurvey.js';
+import  { IOpenSourceSurvey } from '../models/OpenSourceSurvey.js';
 import RepoAnalysisResult from '../models/RepoAnalysisResult.js';
-import Recommendation, { IRecommendation } from '../models/Recommendation.js';
+import  { IRecommendation } from '../models/Recommendation.js';
 
-// --- Type Definitions for AI Analysis (서비스 레이어용 Plain Object 타입) ---
+// --- Type Definitions for AI Analysis ---
 export type SkillLevel = "Novice" | "Beginner" | "Intermediate" | "Advanced" | "Expert";
 
 export interface RepoAnalysisResult {
