@@ -1,8 +1,8 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { verifyClientId } from '../middlewares/verifyClientId';
-import logger from '../utils/logger';
-import OpenSourceSurvey from '../models/OpenSourceSurvey';
+import { verifyClientId } from '../middlewares/verifyClientId.js';
+import logger from '../utils/logger.js';
+import OpenSourceSurvey from '../models/OpenSourceSurvey.js';
 
 // userId issue API (clientId verification required)
 export const userController = async (req: express.Request, res: express.Response) : Promise<void> => {

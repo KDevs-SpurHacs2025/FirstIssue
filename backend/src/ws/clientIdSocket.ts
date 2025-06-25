@@ -1,8 +1,8 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import { v4 as uuidv4 } from 'uuid';
-import Client from '../models/Client';
-import { clientIdStore, CLIENT_ID_TTL_MS } from '../middlewares/verifyClientId';
-import logger from '../utils/logger';
+import Client from '../models/Client.js';
+import { clientIdStore, CLIENT_ID_TTL_MS } from '../middlewares/verifyClientId.js';
+import logger from '../utils/logger.js';
 
 // WebSocket server creation function
 export function createClientIdWebSocketServer(server: any) {

@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from 'mongoose';
-
 export interface IOpenSourceSurvey extends Document {
   userId: string;
   reason: string;
@@ -23,7 +22,7 @@ const OpenSourceSurveySchema: Schema = new Schema(
     like: { type: [String] },
     wishToLearn: { type: [String] },
     numOfExperience: { type: Number },
-    experiencedUrls: { type: [String] }
+    experiencedUrls: { type: [String] },
   },
   { timestamps: true }
 );

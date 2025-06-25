@@ -1,11 +1,11 @@
-import mongoose from "mongoose";
-import dotenv from "dotenv";
-import express from "express";
-import http from "http";
-import routes from "./routes/routes";
-import { createClientIdWebSocketServer } from "./ws/clientIdSocket";
-import logger from "./utils/logger";
-import cors from "cors"; // Import the cors middleware
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import express from 'express';
+import http from 'http';
+import routes from './routes/routes.js';
+import { createClientIdWebSocketServer } from './ws/clientIdSocket.js';
+import logger from './utils/logger.js';
+import cors from 'cors'; // Import the cors middleware
 
 dotenv.config(); // Load environment variables from .env file
 
