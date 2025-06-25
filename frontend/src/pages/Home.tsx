@@ -1,16 +1,32 @@
 import { useEffect } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import { useNavigate } from "react-router-dom";
 import { useUser, useAppDispatch } from "../hooks/useRedux";
 import { useGetApi } from "../hooks/useGetApi";
 import { setTestUserId } from "../store/slices/userSlice";
+import { motion } from "framer-motion";
+import { section1Variants, section1ItemVariants } from "../animations/section1Variants";
+import { useTypingAnimation } from "../animations/useTypingAnimation";
+import GradientButton from "../components/GradientButton";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
+import ContentPasteOutlinedIcon from '@mui/icons-material/ContentPasteOutlined';
+import SearchIcon from '@mui/icons-material/Search';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import { timelineFillMotion, stepRevealMotion } from '../animations/timelineVariants';
 
 const Home = () => {
   const navigate = useNavigate();
   const { testUserId } = useUser();
   const dispatch = useAppDispatch();
   const { get, isLoading, error } = useGetApi();
+
+  // Typing animation for h1
+  const fullTitle = "Find Your First GitHub\nContribution";
+  const [displayedTitle, typingDone] = useTypingAnimation(fullTitle, 50);
 
   // 개발용 - userId 초기화
   const resetUserId = () => {
@@ -54,7 +70,7 @@ const Home = () => {
       <Navbar />
       {/* 에러 표시 */}
       {error && (
-        <div className="fixed w-3/4 h-auto bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4">
+        <div className="z-100 fixed w-3/4 h-auto bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4">
           Error: {error}
         </div>
       )}{" "}
@@ -64,135 +80,222 @@ const Home = () => {
         className="w-full h-auto flex flex-col items-center justify-center text-center text-white mt-[60px] px-28 py-32"
         style={{ minHeight: "calc(100vh - 60px)" }}
       >
-        <h1 className="text-5xl font-bold mb-2">
-          Find Your First GitHub Contribution
-        </h1>
-        <p className="text-sm">
+        <motion.h1
+          className="text-5xl font-bold mb-3 whitespace-pre-line bg-gradient-to-r from-fuchsia-400 to-cyan-400 bg-clip-text text-transparent inline-block"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.9}}
+        >
+          {displayedTitle}
+          {!typingDone && <span className="inline-block animate-pulse">|</span>}
+        </motion.h1>
+        <p className="text-md text-text-gray">
           Find beginner-friendly GitHub issues tailored to your skills and
           experience
         </p>
-        <button
-          className="mt-10 px-6 py-2 bg-blue-600 text-white rounded"
+        <GradientButton
+          className="mt-10"
           onClick={handleGetStarted}
           disabled={isLoading}
         >
-          {isLoading ? "Loading..." : "Get Started"}
-        </button>
+          Get Started
+        </GradientButton>
       </div>
       {/* Section 1 */}
-      <div
+      <motion.div
         id="discovery"
-        className="w-full h-auto flex flex-col items-center justify-center text-white px-10 py-20"
+        className="w-full h-auto flex flex-col items-center justify-center text-white px-10 py-32"
+        variants={section1Variants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
       >
-        <h2 className="text-3xl font-bold mb-1">
+        <motion.h2 className="text-3xl font-bold mb-2" variants={section1ItemVariants}>
           Simple Repository Discovery
-        </h2>
-        <p className="text-sm mb-12">
+        </motion.h2>
+        <motion.p className="text-sm mb-12 text-text-gray" variants={section1ItemVariants}>
           Find GitHub repositories that welcome new contributors
-        </p>
+        </motion.p>
         <div className="w-full flex flex-col md:flex-row items-stretch justify-center gap-x-6">
           {/* Smart Filtering */}
-          <div className="bg-black text-white w-full md:w-1/3 h-full flex flex-col justify-center p-6 mb-6 md:mb-0 rounded-lg">
+          <motion.div
+            className="bg-blue-light text-white w-full md:w-1/3 h-full flex flex-col justify-center p-6 mb-6 md:mb-0 rounded-lg border border-white border-solid border-opacity-10 backdrop-blur-md"
+            variants={section1ItemVariants}
+          >
             <div>
-              <img src="" className="w-12 h-12 mb-6" />
+              <AutoAwesomeIcon className="w-12 h-12 mb-3" style={{ color: '#F9D923' }} /> 
             </div>
             <div>
               <span className="text-md font-semibold mb-3">Smart Filtering</span>
-              <p className="text-sm font-base text-gray-200">
+              <p className="text-sm font-base text-text-gray">
                 Filter repositories by programming language, issue labels, and
                 project activity to find exactly what you’re looking for
               </p>
             </div>
-          </div>
+          </motion.div>
           {/* Beginner-Friendly */}
-          <div className="bg-black text-white w-full md:w-1/3 h-full flex flex-col justify-center p-6 mb-6 md:mb-0 rounded-lg">
+          <motion.div
+            className="bg-blue-light text-white w-full md:w-1/3 h-full flex flex-col justify-center p-6 mb-6 md:mb-0 rounded-lg border border-white border-solid border-opacity-10 backdrop-blur-md"
+            variants={section1ItemVariants}
+          >
             <div>
-              <img src="" className="w-12 h-12 mb-6" />
+              <SentimentSatisfiedAltIcon className="w-12 h-12 mb-3" style={{ color: '#4ADE80' }} />
             </div>
             <div>
               <span className="text-md font-semibold mb-3">Beginner-Friendly </span>
-              <p className="text-sm font-base text-gray-200">
+              <p className="text-sm font-base text-text-gray">
                 Focus on repositories that have “good first issue”,
                 “beginner-friendly”, or “help wanted” labels for new
                 contributors
               </p>
             </div>
-          </div>
+          </motion.div>
           {/* Project Information */}
-          <div className="bg-black text-white w-full md:w-1/3 h-full flex flex-col justify-center p-6 mb-6 md:mb-0 rounded-lg">
+          <motion.div
+            className="bg-blue-light text-white w-full md:w-1/3 h-full flex flex-col justify-center p-6 mb-6 md:mb-0 rounded-lg border border-white border-solid border-opacity-10 backdrop-blur-md"
+            variants={section1ItemVariants}
+          >
             <div>
-              <img src="" className="w-12 h-12 mb-6" />
+              <ContentPasteOutlinedIcon className="w-12 h-12 mb-3" style={{ color: '#60A5FA' }} />
             </div>
             <div>
               <span className="text-md font-semibold mb-3">Project Information</span>
-              <p className="text-sm font-base text-gray-200">
+              <p className="text-sm font-base text-text-gray">
                 View repository details, contribution guidelines, and issue
                 descriptions to understand what you’ll be working on
               </p>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
       {/* Section 2*/}
       <div
         id="how-it-works"
-        className="w-full h-auto flex flex-col items-center justify-center text-white px-10 py-28"
+        className="w-full flex flex-col items-center justify-center text-white px-4 py-28"
       >
         <h2 className="text-3xl font-bold mb-1 text-center">How It Works</h2>
-        <p className="text-sm mb-10 text-center">
+        <p className="text-sm mb-10 text-center text-text-gray">
           Find and contribute to open source projects in just a few steps
         </p>
-        <div className="w-full flex flex-col md:flex-row items-stretch justify-center gap-x-6 min-h-[220px]">
-          {/* Browse Projects */}
-          <div className="bg-blue-900 text-white w-full md:w-1/4 h-full flex flex-col items-center justify-center p-6 rounded-lg">
-            <span className="text-md font-semibold mb-3">Browse Projects</span>
-            <p className="text-sm font-base text-gray-200 text-center">
-              Search through curated GitHub repositories that welcome new
-              contributors
-            </p>
+        <div className="relative w-full max-w-xl flex flex-col items-center">
+          {/* Animated Timeline vertical line */}
+          <motion.div
+            className="absolute left-1/2 -translate-x-1/2 top-0 w-px bg-primary z-0"
+            style={{ minHeight: '420px' }}
+            initial={timelineFillMotion.initial}
+            whileInView={timelineFillMotion.whileInView}
+
+          />
+          {/* Timeline circles */}
+          <div className="absolute left-1/2 -translate-x-1/2 top-0 z-10 w-4 h-full flex flex-col justify-between pointer-events-none" style={{ minHeight: '420px' }}>
+            <span className="w-3 h-3 rounded-full bg-primary block mx-auto" style={{ marginTop: 0 }} />
+            <span className="w-3 h-3 rounded-full bg-primary block mx-auto" />
+            <span className="w-3 h-3 rounded-full bg-primary block mx-auto" />
+            <span className="w-3 h-3 rounded-full bg-primary block mx-auto" style={{ marginBottom: 0 }} />
           </div>
-          {/* Filter & Find */}
-          <div className="bg-blue-800 text-white w-full md:w-1/4 h-full flex flex-col items-center justify-center p-6 rounded-lg">
-            <span className="text-md font-semibold mb-3">Filter & Find</span>
-            <p className="text-sm font-base text-gray-200 text-center">
-              Use filters to find projects matching your skills and interests
-            </p>
-          </div>
-          {/* Read Guidelines */}
-          <div className="bg-blue-700 text-white w-full md:w-1/4 h-full flex flex-col items-center justify-center p-6 rounded-lg">
-            <span className="text-md font-semibold mb-3">Read Guidelines</span>
-            <p className="text-sm font-base text-gray-200 text-center">
-              Review the project's contribution guidelines and issue details
-            </p>
-          </div>
-          {/* Start Contributing */}
-          <div className="bg-blue-600 text-white w-full md:w-1/4 h-full flex flex-col items-center justify-center p-6 rounded-lg">
-            <span className="text-md font-semibold mb-3">Start Contributing</span>
-            <p className="text-sm font-base text-gray-200 text-center">
-              Fork the repository and submit your first pull request
-            </p>
+          {/* Timeline steps */}
+          <div className="relative z-10 flex flex-col gap-16 w-full">
+            {/* Step 1 - Left */}
+            <motion.div
+              className="flex w-full justify-start items-center relative"
+              initial={stepRevealMotion[0].initial}
+              whileInView={stepRevealMotion[0].whileInView}
+              transition={stepRevealMotion[0].transition}
+              viewport={stepRevealMotion[0].viewport}
+            >
+              <div className="w-1/2 flex flex-col items-end pr-8">
+                <div className="max-w-xs text-right">
+                  <span className="block text-xl font-bold text-primary mb-1">1</span>
+                  <span className="text-md font-semibold">Browse Projects</span>
+                  <p className="text-sm font-base text-text-gray mt-1">
+                    Search through curated GitHub repositories that welcome new contributors
+                  </p>
+                </div>
+              </div>
+              <div className="w-1/2" />
+            </motion.div>
+            {/* Step 2 - Right */}
+            <motion.div
+              className="flex w-full justify-end items-center relative"
+              initial={stepRevealMotion[1].initial}
+              whileInView={stepRevealMotion[1].whileInView}
+              transition={stepRevealMotion[1].transition}
+              viewport={stepRevealMotion[1].viewport}
+            >
+              <div className="w-1/2" />
+              <div className="w-1/2 flex flex-col items-start pl-8">
+                <div className="max-w-xs text-left">
+                  <span className="block text-xl font-bold text-primary mb-1">2</span>
+                  <span className="text-md font-semibold">Filter & Find</span>
+                  <p className="text-sm font-base text-text-gray mt-1">
+                    Use filters to find projects matching your skills and interests
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+            {/* Step 3 - Left */}
+            <motion.div
+              className="flex w-full justify-start items-center relative"
+              initial={stepRevealMotion[2].initial}
+              whileInView={stepRevealMotion[2].whileInView}
+              transition={stepRevealMotion[2].transition}
+              viewport={stepRevealMotion[2].viewport}
+            >
+              <div className="w-1/2 flex flex-col items-end pr-8">
+                <div className="max-w-xs text-right">
+                  <span className="block text-xl font-bold text-primary mb-1">3</span>
+                  <span className="text-md font-semibold">Read Guidelines</span>
+                  <p className="text-sm font-base text-text-gray mt-1">
+                    Review the project's contribution guidelines and issue details
+                  </p>
+                </div>
+              </div>
+              <div className="w-1/2" />
+            </motion.div>
+            {/* Step 4 - Right */}
+            <motion.div
+              className="flex w-full justify-end items-center relative"
+              initial={stepRevealMotion[3].initial}
+              whileInView={stepRevealMotion[3].whileInView}
+              transition={stepRevealMotion[3].transition}
+              viewport={stepRevealMotion[3].viewport}
+            >
+              <div className="w-1/2" />
+              <div className="w-1/2 flex flex-col items-start pl-8">
+                <div className="max-w-xs text-left">
+                  <span className="block text-xl font-bold text-primary mb-1">4</span>
+                  <span className="text-md font-semibold">Start Contributing</span>
+                  <p className="text-sm font-base text-text-gray mt-1">
+                    Fork the repository and submit your first pull request
+                  </p>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </div>
       {/* Section 3*/}
       <div
         id="ready"
-        className="w-full h-auto flex flex-col items-center justify-center text-white py-20 px-10"
+        className="w-full h-auto flex flex-col items-center justify-center text-white py-36 px-10"
       >
         <h2 className="text-3xl font-bold mb-1">
-          Ready to Contribute to Open Source?
+          <span className="bg-gradient-to-r from-fuchsia-500 to-cyan-500 bg-clip-text text-transparent inline-block">
+            Ready
+          </span>{" "}
+          to Contribute to Open Source?
         </h2>
-        <p className="text-base mb-4">
+        <p className="text-base mb-4 text-text-gray">
           Start exploring GitHub repositories that are perfect for your first
           contribution
         </p>
-        <button
-          className="mt-4 px-6 py-2 bg-blue-600 text-white rounded"
+        <GradientButton
+          className="mt-4"
           onClick={handleGetStarted}
           disabled={isLoading}
         >
-          {isLoading ? "Loading..." : "Get Started"}
-        </button>{" "}
+          Get Started
+        </GradientButton>
       </div>
       {/* Footer */}
       <Footer />
