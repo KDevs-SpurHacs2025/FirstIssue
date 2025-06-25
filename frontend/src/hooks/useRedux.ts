@@ -14,3 +14,7 @@ export const useUser = () => {
 export const useSurvey = () => {
   return useAppSelector((state) => state.survey);
 };
+
+export const useRecommendation = () => {
+  return useAppSelector((state) => state.recommendation);
+};
