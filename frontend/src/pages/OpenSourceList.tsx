@@ -45,6 +45,11 @@ const OpenSourceList = () => {
 
   const cards = transformRepositoriesToCards();
 
+  // Advanced Insights 핸들러 - OpenSourceDetail로 이동
+  const handleAdvancedInsights = (repoId: number) => {
+    navigate(`/open-source-detail/${repoId}?userId=${testUserId}`);
+  };
+
   // 재생성 버튼 핸들러
   const handleRegenerate = async () => {
     if (!survey.isCompleted) {
@@ -186,13 +191,9 @@ const OpenSourceList = () => {
   };
 
   // 로딩 상태
-if (isLoading || apiLoading) {
-  return (
-    <LoadingScreen
-      title="Loading your recommendations..."
-    />
-  );
-}
+  if (isLoading || apiLoading) {
+    return <LoadingScreen title="Loading your recommendations..." />;
+  }
 
   // 에러 상태
   if (error) {
@@ -228,25 +229,25 @@ if (isLoading || apiLoading) {
         >
           {isLoading || apiLoading ? "Loading..." : "Regenerate"}
         </button>
-      </div> 
+      </div>
       {/* No repository page */}
       {repositories.length === 0 && (
         <div className="text-center py-48">
           <div className="mb-4">
- <svg
-        className="mx-auto h-12 w-12 text-gray-400"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <motion.path
-          {...emptyIconDrawMotion}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-        />
-      </svg>
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <motion.path
+                {...emptyIconDrawMotion}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
           </div>
           <h3 className="text-2xl font-medium text-white mb-2">
             No recommendations yet
@@ -255,12 +256,12 @@ if (isLoading || apiLoading) {
             Complete the survey to get personalized open source project
             recommendations
           </p>
-            <GradientButton
-              onClick={() => navigate("/survey")}
-              className="px-6 py-2 rounded-lg text-white font-semibold transition-transform hover:scale-105"
-            >
-              Take Survey
-            </GradientButton>
+          <GradientButton
+            onClick={() => navigate("/survey")}
+            className="px-6 py-2 rounded-lg text-white font-semibold transition-transform hover:scale-105"
+          >
+            Take Survey
+          </GradientButton>
         </div>
       )}{" "}
       {repositories.length > 0 &&
@@ -276,10 +277,11 @@ if (isLoading || apiLoading) {
             difficulties={card.difficulties}
             description={card.description}
             url={card.url}
+            onAdvancedInsights={handleAdvancedInsights}
           />
         ))}
       {/* Footer */}
-        <Footer />
+      <Footer />
     </div>
   );
 };
