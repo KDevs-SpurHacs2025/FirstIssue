@@ -26,7 +26,7 @@ export interface IRecommendation extends Document {
 const RecommendationSchema: Schema = new Schema(
   {
     userId: { type: String, required: true, index: true },
-    Rank: { type: Number, required: true },
+    Rank: { type: Number},
     SuitabilityScore: { type: String, required: true },
     RepoName: { type: String, required: true },
     RepoURL: { type: String, required: true },

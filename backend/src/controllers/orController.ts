@@ -108,7 +108,7 @@ export const getOpenSourceRecommendations = async (req: Request, res: Response):
         if (recommendations && recommendations.length > 0) {
             const recBulkOps = (recommendations as any[]).map((rec) => ({
                 updateOne: {
-                    filter: { userId, RepoURL: rec["Repo URL"] },
+                    filter: { userId, Rank: rec["Rank"] }, // Use userId + Rank as unique key
                     update: { $set: { ...mapRecommendationFields(rec), userId } },
                     upsert: true
                 }
