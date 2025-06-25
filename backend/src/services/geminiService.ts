@@ -1,10 +1,10 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import logger from '../utils/logger.js';
-import OpenSourceSurvey, { IOpenSourceSurvey } from '../models/OpenSourceSurvey.js';
+import  { IOpenSourceSurvey } from '../models/OpenSourceSurvey.js';
 import RepoAnalysisResult from '../models/RepoAnalysisResult.js';
-import Recommendation, { IRecommendation } from '../models/Recommendation.js';
+import  { IRecommendation } from '../models/Recommendation.js';
 
-// --- Type Definitions for AI Analysis (서비스 레이어용 Plain Object 타입) ---
+// --- Type Definitions for AI Analysis ---
 export type SkillLevel = "Novice" | "Beginner" | "Intermediate" | "Advanced" | "Expert";
 
 export interface RepoAnalysisResult {
@@ -207,6 +207,11 @@ export async function analyzeUserOpenSourceProfile(
         experienceList = '      N/A\n';
     }
 
+    // Format ContributionDirections for the prompt
+    const contributionDirectionsList = (answers.ContributionDirections && answers.ContributionDirections.length > 0)
+      ? answers.ContributionDirections.map((d: string) => `- ${d}`).join("\n")
+      : 'N/A';
+
     // Format repo analysis summary as a JSON string for the prompt
     const repoAnalysisSummary = JSON.stringify(repoAnalyses, null, 2);
 
@@ -214,7 +219,6 @@ export async function analyzeUserOpenSourceProfile(
 You are an AI assistant specialized in open-source contribution recommendations. You will analyze user survey responses, public Git repos (with types), and provided AI-based repo analysis (developer style, skills, strengths, weaknesses).
 
 1. Analyze user survey for motivation, preferred languages/frameworks, and learning interests.
-
 2. Analyze user's public Git repos using provided AI-based analysis (languages, types, code quality, contribution patterns, strengths, weaknesses, development style). AI analysis is a key basis.
 
 3. Recommend 5 suitable open-source projects. Strict rules:
@@ -239,7 +243,12 @@ You are an AI assistant specialized in open-source contribution recommendations.
     - ReasonForRecommendation (A **very concise, one-sentence summary** explaining the primary reason this project is suitable for the user, referencing their skills/interests and repo analysis. Example: "This project directly aligns with the user's React skills and their wish to learn Three.js, leveraging their frontend development strengths.")
     - CurrentStatusDevelopmentDirection (Information about recent activity and future plans.)
     - GoodFirstIssue (true/false)
-    - ContributionDirections (A list of **1 to 3 highly specific and actionable ways** the user can contribute to this project, based on their skills and the project's nature. Each item must be an object with 'number', 'title', and 'description' fields. The 'number' field is a sequential integer starting from 1, representing the action's order from easiest to most challenging. The array MUST be sorted by this 'number' field.
+    - ContributionDirections (A list of **1 to 3 highly specific and actionable ways** the user can contribute to this project, based on their skills and the project's nature. 
+      **Each object's title must ONLY use one of the user's selected values below:**
+      ${contributionDirectionsList}
+      For example, if the user selected only ["Code contributions"], then only "Code contributions" is allowed as a title.
+      Do NOT include any unselected values such as "Documentation", "Design & UI/UX", or "Testing & Reviewing" as a title.
+      Each item must be an object with 'number', 'title', and 'description' fields. The 'number' field is a sequential integer starting from 1, representing the action's order from easiest to most challenging. The array MUST be sorted by this 'number' field.
       Guidance for 'description' content based on difficulty:
         1. **Novice/Beginner:** Focus on tasks with low barrier to entry like documentation improvements (fix typos, add missing examples), README enhancements, translation work, or very simple UI fixes. Helps user understand basic project structure and Git workflow.
         2. **Intermediate:** Focus on tasks requiring some codebase understanding like fixing 'good first issue' bugs, adding small well-defined features, writing new test cases, or minor refactorings. Helps user deepen technical skills.
@@ -253,6 +262,7 @@ Survey Responses:
 - Q5. Languages/Frameworks you want to learn: ${answers.wishToLearn.join(', ')}
 - Q6. Number of open source projects participated: ${answers.numOfExperience}
 - Q7. Previous open source experience URLs (up to 5):\n${experienceList}
+- Q8. Preferred contribution types (multiple allowed, only include user's selection):\n${contributionDirectionsList}
 
 AI-based Analysis of User's Public Git Repositories:
 // This section contains an array of JSON objects, where each object is the analysis result for a user's public repository.

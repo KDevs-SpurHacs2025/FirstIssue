@@ -3,7 +3,7 @@ import { analyzeUserOpenSourceProfile, OpenSourceRecommendation, analyzeGitRepoP
 import logger from '../utils/logger.js';
 import OpenSourceSurvey from '../models/OpenSourceSurvey.js';
 import RepoAnalysisResult from '../models/RepoAnalysisResult.js';
-import Recommendation from '../models/Recommendation.js';
+import Recommendation, { mapRecommendationFields } from '../models/Recommendation.js';
 
 
 // Extract required fields from the schema dynamically
@@ -59,7 +59,22 @@ export const getOpenSourceRecommendations = async (req: Request, res: Response):
         }
         logger.info('Repository analyses completed successfully:', repoAnalyses);
 
-        
+        // import RepoAnalysisResult model
+        if (repoAnalyses && repoAnalyses.length > 0) {
+            const bulkOps = repoAnalyses.map((analysis, idx) => ({
+                updateOne: {
+                    filter: { userId, repoUrl: analysis.repoUrl },
+                    update: { $set: { ...analysis, userId } },
+                    upsert: true
+                }
+            }));
+            try {
+                await RepoAnalysisResult.bulkWrite(bulkOps);
+                logger.info('Repo analysis results upserted to RepoAnalysisResult collection');
+            } catch (repoDbErr: any) {
+                logger.error('Failed to upsert repo analysis results:', repoDbErr);
+            }
+        }
 
         // Analyze the user's open source profile using the answers and repo analyses
         const result = await analyzeUserOpenSourceProfile(answers, repoAnalyses);
@@ -91,10 +106,10 @@ export const getOpenSourceRecommendations = async (req: Request, res: Response):
 
         // Save recommendations to Recommendation collection (bulk upsert)
         if (recommendations && recommendations.length > 0) {
-            const recBulkOps = recommendations.map((rec) => ({
+            const recBulkOps = (recommendations as any[]).map((rec) => ({
                 updateOne: {
-                    filter: { userId, RepoURL: rec.RepoURL },
-                    update: { $set: { ...rec, userId } },
+                    filter: { userId, RepoURL: rec["Repo URL"] },
+                    update: { $set: { ...mapRecommendationFields(rec), userId } },
                     upsert: true
                 }
             }));
@@ -106,23 +121,6 @@ export const getOpenSourceRecommendations = async (req: Request, res: Response):
             }
         }
 
-        // import RepoAnalysisResult model
-        // 이미 상단에서 import RepoAnalysisResult from '../models/RepoAnalysisResult';
-        if (repoAnalyses && repoAnalyses.length > 0) {
-            const bulkOps = repoAnalyses.map((analysis, idx) => ({
-                updateOne: {
-                    filter: { userId, repoUrl: analysis.repoUrl },
-                    update: { $set: { ...analysis, userId } },
-                    upsert: true
-                }
-            }));
-            try {
-                await RepoAnalysisResult.bulkWrite(bulkOps);
-                logger.info('Repo analysis results upserted to RepoAnalysisResult collection');
-            } catch (repoDbErr: any) {
-                logger.error('Failed to upsert repo analysis results:', repoDbErr);
-            }
-        }
 
         // Return success response and recommendations to the client
         res.status(200).json({ success: true, recommendations: recommendations });
