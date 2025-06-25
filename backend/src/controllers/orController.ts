@@ -22,6 +22,14 @@ export const getOpenSourceRecommendations = async (req: Request, res: Response):
         return;
     }
 
+    // Check wheter the userId exists in OpenSourceSurvey collection
+    const existingSurvey = await OpenSourceSurvey.findOne({ userId });
+    if (!existingSurvey) {
+        logger.warn(`userId ${userId} not found in OpenSourceSurvey collection`);
+        res.status(404).json({ success: false, error: 'userId not found in survey records' });
+        return;
+    }
+
     try {
         const answers = req.body;
         // Check for missing required fields based on the model (excluding generated fields)

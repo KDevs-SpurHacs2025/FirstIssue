@@ -1,56 +1,11 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import logger from '../utils/logger'; // Assuming you have a logger utility
+import OpenSourceSurvey, { IOpenSourceSurvey } from '../models/OpenSourceSurvey';
+import RepoAnalysisResult, { IRepoAnalysisResult } from '../models/RepoAnalysisResult';
+import Recommendation, { IRecommendation } from '../models/Recommendation';
 
 // --- Type Definitions for AI Analysis ---
 export type SkillLevel = "Novice" | "Beginner" | "Intermediate" | "Advanced" | "Expert";
-
-export interface RepoAnalysisResult {
-  devDirection: string; // Overall Development Direction/Focus (e.g., "Web Frontend", "Backend API")
-  languages: { name: string; skill: SkillLevel }[];
-  frameworks: { name: string; skill: SkillLevel }[];
-  packages: { name: string; skill: SkillLevel }[];
-  habits: { strengths: string[]; improvements: string[] };
-  overallSkillLevel: SkillLevel; // A single summarized skill level for the developer based on all findings
-  error?: string; // Optional field for error handling
-  detail?: string; // Optional detail for errors
-  rawGeminiResponse?: string; // Optional raw response for debugging
-}
-
-// --- Type Definition for User Survey Answers ---
-export interface UserSurveyAnswers {
-  reason: string;
-  publicRepos: string[];
-  repoTypes: string[]; // e.g., 'web', 'mobile', 'backend'
-  well: string[]; // Languages/frameworks user is good at
-  like: string[]; // Languages/frameworks user likes
-  wishToLearn: string[]; // Languages/frameworks user wants to learn
-  numOfExperience: number; // Number of past open-source contributions (0 for first-timer)
-  experiencedUrls: string[]; // URLs of previous open-source contributions
-}
-
-// --- Type Definition for Contribution Direction (for recommended projects) ---
-export interface ContributionDirection {
-  number: number; // Sequential order, 1 from easiest to most challenging
-  title: string; // Brief title of the contribution type
-  description: string; // Detailed description of what the user can do
-}
-
-// --- Type Definition for Open Source Recommendation Output ---
-export interface OpenSourceRecommendation {
-  Rank: number; // 1-5, 1 being the most recommended
-  SuitabilityScore: string; // e.g., "95%"
-  RepoName: string;
-  RepoURL: string;
-  CreatedDate: string; // YYYY-MM-DD
-  LatestUpdatedDate: string; // YYYY-MM-DD
-  LanguagesFrameworks: string[];
-  Difficulties: SkillLevel; // One of Novice | Beginner | Intermediate | Advanced | Expert
-  ShortDescription: string;
-  ReasonForRecommendation: string; // Concise explanation
-  CurrentStatusDevelopmentDirection: string;
-  GoodFirstIssue: boolean; // true if the project currently has beginner-friendly issues
-  ContributionDirections: ContributionDirection[]; // Specific ways a user can contribute with detailed descriptions
-}
 
 // --- Helper function to get current date in YYYY-MM-DD format ---
 function getTodayDateString(): string {
@@ -72,7 +27,7 @@ function getTodayDateString(): string {
 export async function analyzeGitRepoProfile(
   repoUrl: string,
   repoType?: string
-): Promise<RepoAnalysisResult & { repoUrl: string }> {
+): Promise<IRepoAnalysisResult & { repoUrl: string }> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     logger.error('Error: GEMINI_API_KEY is not set in environment variables for repo analysis.');
@@ -133,7 +88,7 @@ Return the result as a JSON object with the following structure:
     const jsonString = text.replace(/```json\n|```/g, '').trim();
     logger.info(`Gemini API response for ${repoUrl}:`, jsonString);
 
-    let analysis: RepoAnalysisResult;
+    let analysis: IRepoAnalysisResult;
     try {
       analysis = JSON.parse(jsonString);
     } catch (parseError: any) {
@@ -169,9 +124,9 @@ Return the result as a JSON object with the following structure:
  * @returns A JSON object containing success status and a list of recommended open-source projects.
  */
 export async function analyzeUserOpenSourceProfile(
-  answers: UserSurveyAnswers,
-  repoAnalyses: RepoAnalysisResult[]
-): Promise<{ success: boolean; recommendations: OpenSourceRecommendation[] } | { error: string; detail: string; rawResponse?: string }> {
+  answers: IOpenSourceSurvey,
+  repoAnalyses: (IRepoAnalysisResult & { repoUrl: string })[]
+): Promise<{ success: boolean; recommendations: IRecommendation[] } | { error: string; detail: string; rawResponse?: string }> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     logger.error('Error: GEMINI_API_KEY is not set in environment variables.');
@@ -334,11 +289,11 @@ Output Format (Strictly follow this JSON array structure):
     const jsonString = text.replace(/```json\n|```/g, '').trim();
     logger.info('Gemini API response for recommendations:', jsonString);
 
-    let analysis: { success: boolean; recommendations: OpenSourceRecommendation[] };
+    let analysis: { success: boolean; recommendations: IRecommendation[] };
     try {
       analysis = {
         success: true, // Assuming success if parsing is successful
-        recommendations: JSON.parse(jsonString) as OpenSourceRecommendation[] // Cast to array of recommendations
+        recommendations: JSON.parse(jsonString) as IRecommendation[] // Cast to array of recommendations
       };
     } catch (parseError: any) {
       logger.error('Failed to parse Gemini API response as JSON for recommendations:', parseError);
