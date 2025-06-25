@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+
 export default {
     content: [
     "./index.html",
@@ -12,7 +12,8 @@ export default {
         'bg-gray': '#1F2937',
         'bg-white': '#F3F4F6',
         'text-gray': '#A3A8B0', 
-        'blue-light': '#162032', // darker than previous #1E293B
+        'text-gray-light': '#C7CBD3', 
+        'blue-light': '#162032',
       }
     },
   },

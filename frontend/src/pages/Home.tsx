@@ -4,19 +4,13 @@ import { useUser, useAppDispatch } from "../hooks/useRedux";
 import { useGetApi } from "../hooks/useGetApi";
 import { setTestUserId } from "../store/slices/userSlice";
 import { motion } from "framer-motion";
-import { section1Variants, section1ItemVariants } from "../animations/section1Variants";
-import { useTypingAnimation } from "../animations/useTypingAnimation";
+import { homeSection1Variants, homeSection1ItemVariants, homeTimelineFillMotion, homeStepRevealMotion, useHomeTypingAnimation } from "../animations/homeAnimations";
 import GradientButton from "../components/GradientButton";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import ContentPasteOutlinedIcon from '@mui/icons-material/ContentPasteOutlined';
-import SearchIcon from '@mui/icons-material/Search';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
-import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import { timelineFillMotion, stepRevealMotion } from '../animations/timelineVariants';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -26,7 +20,7 @@ const Home = () => {
 
   // Typing animation for h1
   const fullTitle = "Find Your First GitHub\nContribution";
-  const [displayedTitle, typingDone] = useTypingAnimation(fullTitle, 50);
+  const [displayedTitle, typingDone] = useHomeTypingAnimation(fullTitle, 50);
 
   // 개발용 - userId 초기화
   const resetUserId = () => {
@@ -43,21 +37,21 @@ const Home = () => {
   const handleGetStarted = async () => {
     try {
       // 기존 userId가 있으면 바로 Survey로 이동
-      if (testUserId) {
-        console.log("🔄 기존 userId 재사용:", testUserId);
-        navigate("/survey");
-        return;
-      }
+      // if (testUserId) {
+      //   console.log("🔄 기존 userId 재사용:", testUserId);
+      //   navigate("/survey");
+      //   return;
+      // }
 
-      // 새 userId 생성
-      const data = await get("/generate/userId");
-      dispatch(setTestUserId(data.userId));
+      // // 새 userId 생성
+      // const data = await get("/generate/userId");
+      // dispatch(setTestUserId(data.userId));
 
-      console.log("✅ 새 userId 생성:", data.userId);
-      console.log(
-        "✅ localStorage 저장 확인:",
-        localStorage.getItem("persist:root")
-      );
+      // console.log("✅ 새 userId 생성:", data.userId);
+      // console.log(
+      //   "✅ localStorage 저장 확인:",
+      //   localStorage.getItem("persist:root")
+      // );
 
       // Survey 페이지로 이동
       navigate("/survey");
@@ -67,13 +61,14 @@ const Home = () => {
   };
   return (
     <div className="w-full h-auto flex flex-col items-center bg-bg-black">
-      <Navbar />
-      {/* 에러 표시 */}
+      {/* Error Popup */}
       {error && (
         <div className="z-100 fixed w-3/4 h-auto bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4">
           Error: {error}
         </div>
       )}{" "}
+        {/* Navbar */}
+      <Navbar />
       {/* Hero Section */}
       <div
         id="hero"
@@ -94,7 +89,7 @@ const Home = () => {
           experience
         </p>
         <GradientButton
-          className="mt-10"
+          className="mt-10 px-6 py-2"
           onClick={handleGetStarted}
           disabled={isLoading}
         >
@@ -104,23 +99,23 @@ const Home = () => {
       {/* Section 1 */}
       <motion.div
         id="discovery"
-        className="w-full h-auto flex flex-col items-center justify-center text-white px-10 py-32"
-        variants={section1Variants}
+        className="w-full h-auto flex flex-col items-center justify-center text-white px-4 md:px-10 py-32"
+        variants={homeSection1Variants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
       >
-        <motion.h2 className="text-3xl font-bold mb-2" variants={section1ItemVariants}>
+        <motion.h2 className="text-3xl font-bold mb-2" variants={homeSection1ItemVariants}>
           Simple Repository Discovery
         </motion.h2>
-        <motion.p className="text-sm mb-12 text-text-gray" variants={section1ItemVariants}>
+        <motion.p className="text-sm mb-12 text-text-gray" variants={homeSection1ItemVariants}>
           Find GitHub repositories that welcome new contributors
         </motion.p>
         <div className="w-full flex flex-col md:flex-row items-stretch justify-center gap-x-6">
           {/* Smart Filtering */}
           <motion.div
             className="bg-blue-light text-white w-full md:w-1/3 h-full flex flex-col justify-center p-6 mb-6 md:mb-0 rounded-lg border border-white border-solid border-opacity-10 backdrop-blur-md"
-            variants={section1ItemVariants}
+            variants={homeSection1ItemVariants}
           >
             <div>
               <AutoAwesomeIcon className="w-12 h-12 mb-3" style={{ color: '#F9D923' }} /> 
@@ -136,7 +131,7 @@ const Home = () => {
           {/* Beginner-Friendly */}
           <motion.div
             className="bg-blue-light text-white w-full md:w-1/3 h-full flex flex-col justify-center p-6 mb-6 md:mb-0 rounded-lg border border-white border-solid border-opacity-10 backdrop-blur-md"
-            variants={section1ItemVariants}
+            variants={homeSection1ItemVariants}
           >
             <div>
               <SentimentSatisfiedAltIcon className="w-12 h-12 mb-3" style={{ color: '#4ADE80' }} />
@@ -153,7 +148,7 @@ const Home = () => {
           {/* Project Information */}
           <motion.div
             className="bg-blue-light text-white w-full md:w-1/3 h-full flex flex-col justify-center p-6 mb-6 md:mb-0 rounded-lg border border-white border-solid border-opacity-10 backdrop-blur-md"
-            variants={section1ItemVariants}
+            variants={homeSection1ItemVariants}
           >
             <div>
               <ContentPasteOutlinedIcon className="w-12 h-12 mb-3" style={{ color: '#60A5FA' }} />
@@ -182,9 +177,9 @@ const Home = () => {
           <motion.div
             className="absolute left-1/2 -translate-x-1/2 top-0 w-px bg-primary z-0"
             style={{ minHeight: '420px' }}
-            initial={timelineFillMotion.initial}
-            whileInView={timelineFillMotion.whileInView}
-
+            initial={homeTimelineFillMotion.initial}
+            whileInView={homeTimelineFillMotion.whileInView}
+           // transition={homeTimelineFillMotion.transition}
           />
           {/* Timeline circles */}
           <div className="absolute left-1/2 -translate-x-1/2 top-0 z-10 w-4 h-full flex flex-col justify-between pointer-events-none" style={{ minHeight: '420px' }}>
@@ -198,10 +193,10 @@ const Home = () => {
             {/* Step 1 - Left */}
             <motion.div
               className="flex w-full justify-start items-center relative"
-              initial={stepRevealMotion[0].initial}
-              whileInView={stepRevealMotion[0].whileInView}
-              transition={stepRevealMotion[0].transition}
-              viewport={stepRevealMotion[0].viewport}
+              initial={homeStepRevealMotion[0].initial}
+              whileInView={homeStepRevealMotion[0].whileInView}
+              transition={homeStepRevealMotion[0].transition}
+              viewport={homeStepRevealMotion[0].viewport}
             >
               <div className="w-1/2 flex flex-col items-end pr-8">
                 <div className="max-w-xs text-right">
@@ -217,10 +212,10 @@ const Home = () => {
             {/* Step 2 - Right */}
             <motion.div
               className="flex w-full justify-end items-center relative"
-              initial={stepRevealMotion[1].initial}
-              whileInView={stepRevealMotion[1].whileInView}
-              transition={stepRevealMotion[1].transition}
-              viewport={stepRevealMotion[1].viewport}
+              initial={homeStepRevealMotion[1].initial}
+              whileInView={homeStepRevealMotion[1].whileInView}
+              transition={homeStepRevealMotion[1].transition}
+              viewport={homeStepRevealMotion[1].viewport}
             >
               <div className="w-1/2" />
               <div className="w-1/2 flex flex-col items-start pl-8">
@@ -236,10 +231,10 @@ const Home = () => {
             {/* Step 3 - Left */}
             <motion.div
               className="flex w-full justify-start items-center relative"
-              initial={stepRevealMotion[2].initial}
-              whileInView={stepRevealMotion[2].whileInView}
-              transition={stepRevealMotion[2].transition}
-              viewport={stepRevealMotion[2].viewport}
+              initial={homeStepRevealMotion[2].initial}
+              whileInView={homeStepRevealMotion[2].whileInView}
+              transition={homeStepRevealMotion[2].transition}
+              viewport={homeStepRevealMotion[2].viewport}
             >
               <div className="w-1/2 flex flex-col items-end pr-8">
                 <div className="max-w-xs text-right">
@@ -255,10 +250,10 @@ const Home = () => {
             {/* Step 4 - Right */}
             <motion.div
               className="flex w-full justify-end items-center relative"
-              initial={stepRevealMotion[3].initial}
-              whileInView={stepRevealMotion[3].whileInView}
-              transition={stepRevealMotion[3].transition}
-              viewport={stepRevealMotion[3].viewport}
+              initial={homeStepRevealMotion[3].initial}
+              whileInView={homeStepRevealMotion[3].whileInView}
+              transition={homeStepRevealMotion[3].transition}
+              viewport={homeStepRevealMotion[3].viewport}
             >
               <div className="w-1/2" />
               <div className="w-1/2 flex flex-col items-start pl-8">
@@ -289,13 +284,17 @@ const Home = () => {
           Start exploring GitHub repositories that are perfect for your first
           contribution
         </p>
-        <GradientButton
-          className="mt-4"
-          onClick={handleGetStarted}
-          disabled={isLoading}
-        >
-          Get Started
-        </GradientButton>
+        <div className="relative flex flex-col items-center">
+          {/* Animated Gradient Border */}
+          <span className="absolute inset-0 w-full h-full rounded-full blur-md opacity-30 animate-pulse bg-gradient-to-r from-fuchsia-500 to-cyan-500" aria-hidden="true" />
+          <GradientButton
+            className="mt-4 relative z-10 px-6 py-2"
+            onClick={handleGetStarted}
+            disabled={isLoading}
+          >
+            Get Started
+          </GradientButton>
+        </div>
       </div>
       {/* Footer */}
       <Footer />
