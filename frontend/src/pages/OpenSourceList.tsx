@@ -14,60 +14,6 @@ import {
   clearRecommendations,
 } from "../store/slices/recommendationSlice";
 
-// Dummy texts - fallback when no Redux data
-const hardcodedCards = [
-  {
-    repoName: "react",
-    percentage: 98,
-    createdAt: "2013-05-24",
-    updatedAt: "2025-06-20",
-    languages: ["JavaScript", "TypeScript"],
-    difficulties: ["Intermediate"],
-    description:
-      "A declarative, efficient, and flexible JavaScript library for building user interfaces.",
-  },
-  {
-    repoName: "nestjs",
-    percentage: 92,
-    createdAt: "2017-03-01",
-    updatedAt: "2025-06-18",
-    languages: ["TypeScript"],
-    difficulties: ["Intermediate", "Advanced"],
-    description:
-      "A progressive Node.js framework for building efficient, reliable and scalable server-side applications.",
-  },
-  {
-    repoName: "tailwindcss",
-    percentage: 89,
-    createdAt: "2017-11-01",
-    updatedAt: "2025-06-15",
-    languages: ["CSS", "JavaScript"],
-    difficulties: ["Beginner", "Intermediate"],
-    description:
-      "A utility-first CSS framework for rapidly building custom user interfaces.",
-  },
-  {
-    repoName: "vscode",
-    percentage: 85,
-    createdAt: "2015-04-29",
-    updatedAt: "2025-06-10",
-    languages: ["TypeScript", "JavaScript"],
-    difficulties: ["Advanced"],
-    description:
-      "Visual Studio Code - Open Source code editor developed by Microsoft.",
-  },
-  {
-    repoName: "freeCodeCamp",
-    percentage: 80,
-    createdAt: "2014-10-15",
-    updatedAt: "2025-06-12",
-    languages: ["JavaScript", "HTML", "CSS"],
-    difficulties: ["Beginner"],
-    description:
-      "Learn to code for free with millions of other people around the world.",
-  },
-];
-
 // OpenSourceList Component
 const OpenSourceList = () => {
   const navigate = useNavigate();
@@ -76,23 +22,20 @@ const OpenSourceList = () => {
   const survey = useSurvey();
   const { repositories, isLoading, error } = useRecommendation();
   const { post, isLoading: apiLoading } = usePostApi();
-
   // Redux에서 가져온 추천 데이터를 OpenSourceCard 형태로 변환
   const transformRepositoriesToCards = () => {
-    if (repositories.length === 0) {
-      return hardcodedCards; // 추천 데이터가 없으면 하드코딩된 데이터 사용
-    }
-
     return repositories.map((repo) => ({
+      repoId: repo.id,
       repoName: repo.name,
-      percentage: Math.floor(repo.stars / 100), // stars를 percentage로 간단 변환
+      percentage: repo.stars, // Suitability Score를 percentage로 사용
       createdAt: repo.lastActivity.split("T")[0], // ISO 날짜를 YYYY-MM-DD 형태로
       updatedAt: repo.lastActivity.split("T")[0],
-      languages: [repo.language],
+      languages: repo.language.split(", "), // 문자열을 배열로 분할
       difficulties: [
         repo.difficulty.charAt(0).toUpperCase() + repo.difficulty.slice(1),
       ],
       description: repo.description || "No description available.",
+      url: repo.url, // Repository URL 추가
     }));
   };
 
@@ -155,60 +98,78 @@ const OpenSourceList = () => {
         experiencedUrls: survey.pastLinks.filter((url) => url.trim() !== ""),
       };
       const result = await post("/generate/recommendations", apiData);
+      console.log("📥 Regenerate API Response:", result);
 
-      // API 응답을 Redux에 저장
-      // 네트워크 탭에서 보이는 중첩 구조 처리: result.recommendations.recommendations
+      // API 응답에서 사용 가능한 모든 필드 확인 (개발용)
       if (result && typeof result === "object" && "recommendations" in result) {
-        const outerRecommendations = (result as { recommendations: any })
+        const recommendations = (result as { recommendations: unknown[] })
           .recommendations;
-        if (outerRecommendations && outerRecommendations.recommendations) {
-          const recommendations =
-            outerRecommendations.recommendations as unknown[];
+        if (Array.isArray(recommendations) && recommendations.length > 0) {
+          console.log(
+            "🔍 Available fields in first recommendation:",
+            Object.keys(recommendations[0] as Record<string, unknown>)
+          );
+        }
+      } // API 응답을 Redux에 저장
+      if (result && typeof result === "object" && "recommendations" in result) {
+        const recommendations = (result as { recommendations: unknown[] })
+          .recommendations;
+
+        if (Array.isArray(recommendations) && recommendations.length > 0) {
           const transformedRepos = recommendations.map(
             (repo: unknown, index: number) => {
               const repoObj = repo as Record<string, unknown>;
+
+              // ContributionDirections 파싱
+              let contributionDirections: Array<{
+                number: number;
+                title: string;
+                description: string;
+              }> = [];
+
+              if (Array.isArray(repoObj["ContributionDirections"])) {
+                contributionDirections = repoObj["ContributionDirections"].map(
+                  (direction: unknown, idx: number) => {
+                    const directionObj = direction as Record<string, unknown>;
+                    return {
+                      number: (directionObj.number || idx + 1) as number,
+                      title: (directionObj.title ||
+                        `Contribution ${idx + 1}`) as string,
+                      description: (directionObj.description || "") as string,
+                    };
+                  }
+                );
+              }
+
               return {
                 id: index + 1,
-                name: (repoObj["Repo Name"] ||
-                  repoObj.name ||
-                  repoObj.repoName ||
-                  "Unknown") as string,
-                fullName: (repoObj["Repo Name"] ||
-                  repoObj.fullName ||
-                  repoObj.name ||
-                  "Unknown") as string,
-                description: (repoObj["Short Description"] ||
-                  repoObj.description ||
-                  "") as string,
-                language: ((Array.isArray(repoObj["Languages/Frameworks"]) &&
-                  repoObj["Languages/Frameworks"][0]) ||
-                  repoObj.language ||
-                  (Array.isArray(repoObj.languages) && repoObj.languages[0]) ||
-                  "Unknown") as string,
-                stars: (repoObj.stars ||
-                  repoObj.stargazers_count ||
-                  0) as number,
-                forks: (repoObj.forks || repoObj.forks_count || 0) as number,
-                issues: (repoObj.issues ||
-                  repoObj.open_issues_count ||
-                  0) as number,
-                url: (repoObj["Repo URL"] ||
-                  repoObj.url ||
-                  repoObj.html_url ||
-                  "") as string,
-                goodFirstIssues: (repoObj.goodFirstIssues || 0) as number,
+                name: (repoObj["Repo Name"] || "Unknown") as string,
+                fullName: (repoObj["Repo Name"] || "Unknown") as string,
+                description: (repoObj["Short Description"] || "") as string,
+                language: (Array.isArray(repoObj["Languages/Frameworks"])
+                  ? repoObj["Languages/Frameworks"].join(", ")
+                  : "Unknown") as string,
+                stars: parseInt(
+                  (repoObj["Suitability Score"] as string)?.replace("%", "") ||
+                    "0"
+                ),
+                forks: 0,
+                issues: 0,
+                url: (repoObj["Repo URL"] || "") as string,
+                goodFirstIssues: repoObj["GoodFirstIssue"] ? 1 : 0,
                 lastActivity: (repoObj["Latest Updated Date"] ||
-                  repoObj.lastActivity ||
-                  repoObj.updated_at ||
                   new Date().toISOString()) as string,
-                difficulty: (repoObj["Difficulties"] ||
-                  repoObj.difficulty ||
-                  "beginner") as "beginner" | "intermediate" | "advanced",
+                difficulty: (repoObj["Difficulties"] || "beginner") as
+                  | "beginner"
+                  | "intermediate"
+                  | "advanced",
+                contributionDirections,
               };
             }
           );
 
           dispatch(setRepositories(transformedRepos));
+          console.log("✅ Repositories saved to Redux:", transformedRepos);
         }
       }
 
@@ -267,29 +228,54 @@ const OpenSourceList = () => {
         >
           {isLoading || apiLoading ? "Loading..." : "Regenerate"}
         </button>
-      </div>
-
+      </div>{" "}
       {repositories.length === 0 && (
-        <div className="mb-4 p-4 bg-yellow-100 border border-yellow-400 rounded">
-          <p className="text-yellow-800">
-            No recommendations found. Showing sample data below. Complete the
-            survey to get personalized recommendations!
+        <div className="text-center py-12">
+          <div className="mb-6">
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            No recommendations yet
+          </h3>
+          <p className="text-gray-600 mb-6">
+            Complete the survey to get personalized open source project
+            recommendations tailored to your interests and experience level.
           </p>
+          <button
+            onClick={() => navigate("/survey")}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Take Survey
+          </button>
         </div>
-      )}
-
-      {cards.map((card, idx) => (
-        <OpenSourceCard
-          key={card.repoName + idx}
-          repoName={card.repoName}
-          percentage={card.percentage}
-          createdAt={card.createdAt}
-          updatedAt={card.updatedAt}
-          languages={card.languages}
-          difficulties={card.difficulties}
-          description={card.description}
-        />
-      ))}
+      )}{" "}
+      {repositories.length > 0 &&
+        cards.map((card, idx) => (
+          <OpenSourceCard
+            key={card.repoName + idx}
+            repoId={card.repoId}
+            repoName={card.repoName}
+            percentage={card.percentage}
+            createdAt={card.createdAt}
+            updatedAt={card.updatedAt}
+            languages={card.languages}
+            difficulties={card.difficulties}
+            description={card.description}
+            url={card.url}
+          />
+        ))}
     </div>
   );
 };

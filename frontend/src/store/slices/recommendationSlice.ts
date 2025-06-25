@@ -8,12 +8,30 @@ interface Repository {
   description: string;
   language: string;
   stars: number;
-  forks: number;
-  issues: number;
   url: string;
   goodFirstIssues: number;
+  createdAt?: string; // optional for backward compatibility
   lastActivity: string;
   difficulty: "beginner" | "intermediate" | "advanced";
+  contributionDirections: Array<{
+    number: number;
+    title: string;
+    description: string;
+  }>;
+  // API 응답에서 추가로 제공될 수 있는 필드들
+  forks?: number;
+  issues?: number;
+  watchers?: number;
+  owner?: string;
+  license?: string;
+  topics?: string[];
+  primaryLanguage?: string;
+  size?: number;
+  hasWiki?: boolean;
+  hasPages?: boolean;
+  archived?: boolean;
+  disabled?: boolean;
+  pushed?: string;
 }
 
 interface RecommendationState {

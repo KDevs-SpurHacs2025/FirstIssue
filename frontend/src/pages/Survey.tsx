@@ -161,52 +161,124 @@ const Survey = () => {
       dispatch(clearRecommendations());
 
       // Redux 상태를 API 형태로 변환
-      const apiData = transformToApiFormat();
-
-      // 변환된 데이터 로그 (개발용)
+      const apiData = transformToApiFormat(); // 변환된 데이터 로그 (개발용)
       console.log("📤 Sending to API:", apiData); // usePostApi 훅을 사용한 API 호출
       const result = await post("/generate/recommendations", apiData);
       console.log("📥 API Response:", result);
 
-      // API 응답을 Redux에 저장
-      // 네트워크 탭에서 보이는 중첩 구조 처리: result.recommendations.recommendations
-      if (
-        result &&
-        (result as any).recommendations &&
-        (result as any).recommendations.recommendations
-      ) {
-        // 백엔드 응답 형태를 프론트엔드 Repository 형태로 변환
-        const transformedRepos = (
-          result as any
-        ).recommendations.recommendations.map((repo: any, index: number) => ({
-          id: index + 1,
-          name: repo["Repo Name"] || repo.name || repo.repoName || "Unknown",
-          fullName:
-            repo["Repo Name"] || repo.fullName || repo.name || "Unknown",
-          description: repo["Short Description"] || repo.description || "",
-          language:
-            (repo["Languages/Frameworks"] && repo["Languages/Frameworks"][0]) ||
-            repo.language ||
-            (repo.languages && repo.languages[0]) ||
-            "Unknown",
-          stars: repo.stars || repo.stargazers_count || 0,
-          forks: repo.forks || repo.forks_count || 0,
-          issues: repo.issues || repo.open_issues_count || 0,
-          url: repo["Repo URL"] || repo.url || repo.html_url || "",
-          goodFirstIssues: repo.goodFirstIssues || 0,
-          lastActivity:
-            repo["Latest Updated Date"] ||
-            repo.lastActivity ||
-            repo.updated_at ||
-            new Date().toISOString(),
-          difficulty:
-            repo["Difficulties"] || repo.difficulty || ("beginner" as const),
-        }));
+      // API 응답에서 사용 가능한 모든 필드 확인 (개발용)
+      if (result && typeof result === "object" && "recommendations" in result) {
+        const recommendations = (result as { recommendations: unknown[] })
+          .recommendations;
+        if (Array.isArray(recommendations) && recommendations.length > 0) {
+          console.log(
+            "🔍 Available fields in first recommendation:",
+            Object.keys(recommendations[0] as Record<string, unknown>)
+          );
+        }
+      } // API 응답을 Redux에 저장
+      if (result && typeof result === "object" && "recommendations" in result) {
+        const recommendations = (result as { recommendations: unknown[] })
+          .recommendations;
+        if (Array.isArray(recommendations) && recommendations.length > 0) {
+          const transformedRepos = recommendations.map(
+            (repo: unknown, index: number) => {
+              const repoObj = repo as Record<string, unknown>;
+              // 기본 Repository 객체 생성
+              const repository: Record<string, unknown> = {
+                id: index + 1,
+                name: (repoObj["Repo Name"] ||
+                  repoObj["name"] ||
+                  "Unknown") as string,
+                fullName: (repoObj["Repo Name"] ||
+                  repoObj["full_name"] ||
+                  repoObj["name"] ||
+                  "Unknown") as string,
+                description: (repoObj["Short Description"] ||
+                  repoObj["description"] ||
+                  "") as string,
+                language: ((Array.isArray(repoObj["Languages/Frameworks"]) &&
+                  repoObj["Languages/Frameworks"].join(", ")) ||
+                  repoObj["language"] ||
+                  "Unknown") as string,
+                stars: parseInt(
+                  (repoObj["Suitability Score"] as string)?.replace("%", "") ||
+                    (repoObj["stargazers_count"] as string) ||
+                    "0"
+                ),
+                url: (repoObj["Repo URL"] ||
+                  repoObj["html_url"] ||
+                  repoObj["url"] ||
+                  "") as string,
+                goodFirstIssues: repoObj["GoodFirstIssue"] ? 1 : 0,
+                lastActivity: (repoObj["Latest Updated Date"] ||
+                  repoObj["updated_at"] ||
+                  repoObj["pushed_at"] ||
+                  new Date().toISOString()) as string,
+                difficulty: (repoObj["Difficulties"] ||
+                  repoObj["difficulty"] ||
+                  "beginner") as "beginner" | "intermediate" | "advanced",
+                contributionDirections: (repoObj["ContributionDirections"] ||
+                  []) as Array<{
+                  number: number;
+                  title: string;
+                  description: string;
+                }>,
+              };
 
-        dispatch(setRepositories(transformedRepos));
-        console.log("✅ Repositories saved to Redux:", transformedRepos);
+              // 추가적인 선택적 필드들 파싱
+              if (repoObj["forks_count"])
+                repository.forks = parseInt(repoObj["forks_count"] as string);
+              if (repoObj["open_issues_count"])
+                repository.issues = parseInt(
+                  repoObj["open_issues_count"] as string
+                );
+              if (repoObj["watchers_count"])
+                repository.watchers = parseInt(
+                  repoObj["watchers_count"] as string
+                );
+              if (repoObj["owner"]) {
+                const ownerObj = repoObj["owner"] as Record<string, unknown>;
+                repository.owner = ownerObj?.login || repoObj["owner"];
+              }
+              if (repoObj["license"]) {
+                const licenseObj = repoObj["license"] as Record<
+                  string,
+                  unknown
+                >;
+                repository.license = licenseObj?.name || repoObj["license"];
+              }
+              if (repoObj["topics"] && Array.isArray(repoObj["topics"]))
+                repository.topics = repoObj["topics"] as string[];
+              if (repoObj["primary_language"])
+                repository.primaryLanguage = repoObj[
+                  "primary_language"
+                ] as string;
+              if (repoObj["size"])
+                repository.size = parseInt(repoObj["size"] as string);
+              if (repoObj["has_wiki"] !== undefined)
+                repository.hasWiki = Boolean(repoObj["has_wiki"]);
+              if (repoObj["has_pages"] !== undefined)
+                repository.hasPages = Boolean(repoObj["has_pages"]);
+              if (repoObj["archived"] !== undefined)
+                repository.archived = Boolean(repoObj["archived"]);
+              if (repoObj["disabled"] !== undefined)
+                repository.disabled = Boolean(repoObj["disabled"]);
+              if (repoObj["pushed_at"])
+                repository.pushed = repoObj["pushed_at"] as string;
+
+              return repository;
+            }
+          );
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          dispatch(setRepositories(transformedRepos as any));
+          console.log("✅ Repositories saved to Redux:", transformedRepos);
+        } else {
+          console.warn("⚠️ No recommendations found in API response");
+        }
       } else {
-        console.warn("⚠️ No recommendations found in API response");
+        console.warn("⚠️ Invalid API response structure");
       }
 
       dispatch(setLoading(false));
