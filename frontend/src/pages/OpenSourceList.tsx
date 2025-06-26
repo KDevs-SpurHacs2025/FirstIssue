@@ -224,80 +224,78 @@ const OpenSourceList = () => {
   }
 
   return (
-    <div className="w-full h-auto bg-bg-black pt-[120px]">
-      {/* Navbar and Header */}
-      <Navbar />
-      <div className="flex justify-center items-center mb-8">
-        <h1 className="text-3xl font-bold text-white">Top Projects for You</h1>
-      </div>
-      <div className="flex justify-end items-center mb-6 px-40">
-        <GradientButton
-          onClick={handleRegenerate}
-          className="px-6 py-2 rounded-lg text-white font-semibold flex items-center"
-          disabled={isLoading || apiLoading}
-        >
-          Get New Matches
-        </GradientButton>
-      </div>
+  <div className="w-full h-auto bg-bg-black pt-[120px]">
+    <Navbar />
 
-      {/* Repository Cards or Empty State */}
-     {repositories.length > 0 ? (
-        <>
-          {cards.map((card, idx) => (
-            <div key={card.repoName + idx} className="w-full h-auto px-40">
-              <OpenSourceCard
-                repoId={card.repoId}
-                repoName={card.repoName}
-                percentage={card.percentage}
-                createdAt={card.createdAt}
-                updatedAt={card.updatedAt}
-                languages={card.languages}
-                difficulties={card.difficulties}
-                description={card.description}
-                reasonForRecommendation={card.reasonForRecommendation}
-                url={card.url}
-                onAdvancedInsights={handleAdvancedInsights}
-              />
-            </div>
-          ))}
-        </>
-      ) : (
-        // No repository page
-        <div className="w-full h-screen text-center flex flex-col items-center justify-center">
-          <div className="mb-4">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <motion.path
-                {...emptyIconDrawMotion}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-          </div>
-          <h3 className="text-2xl font-medium text-white mb-2">
-            No recommendations yet
-          </h3>
-          <p className="text-text-gray-light text-sm mb-6">
-            Complete the survey to get personalized open source project
-            recommendations
-          </p>
+    {/* Show header, button, and cards only if there are repositories */}
+    {repositories.length > 0 ? (
+      <>
+        <div className="flex justify-between items-center mb-8 px-40">
+          <h1 className="text-3xl font-bold text-white">
+            Top Projects for You
+          </h1>
           <GradientButton
-            onClick={() => navigate("/survey")}
-            className="px-6 py-2 rounded-lg text-white font-semibold transition-transform hover:scale-105"
+            onClick={handleRegenerate}
+            className="px-6 py-2 rounded-lg text-white font-semibold flex items-center"
+            disabled={isLoading || apiLoading}
           >
-            Take Survey
+            Find More
           </GradientButton>
         </div>
-      )}
+        {cards.map((card, idx) => (
+          <div className="w-full h-auto px-40" key={card.repoName + idx}>
+            <OpenSourceCard
+              repoId={card.repoId}
+              repoName={card.repoName}
+              percentage={card.percentage}
+              createdAt={card.createdAt}
+              updatedAt={card.updatedAt}
+              languages={card.languages}
+              difficulties={card.difficulties}
+              description={card.description}
+              reasonForRecommendation={card.reasonForRecommendation}
+              url={card.url}
+              onAdvancedInsights={handleAdvancedInsights}
+            />
+          </div>
+        ))}
+      </>
+    ) : (
+      // No repository page
+      <div className="text-center py-48">
+        <div className="mb-4">
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <motion.path
+              {...emptyIconDrawMotion}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+        </div>
+        <h3 className="text-2xl font-medium text-white mb-2">
+          No recommendations yet
+        </h3>
+        <p className="text-text-gray-light text-sm mb-6">
+          Complete the survey to get personalized open source project recommendations
+        </p>
+        <GradientButton
+          onClick={() => navigate("/survey")}
+          className="px-6 py-2 rounded-lg text-white font-semibold transition-transform hover:scale-105"
+        >
+          Take Survey
+        </GradientButton>
+      </div>
+    )}
 
-      <Footer />
-    </div>
+    <Footer />
+  </div>
   );
 };
 
