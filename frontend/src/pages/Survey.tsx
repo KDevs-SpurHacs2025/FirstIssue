@@ -17,6 +17,7 @@ import {
   setContribCount,
   setPastLinks,
   completeSurvey,
+  resetSurvey, // 초기화 액션 추가
 } from "../store/slices/surveySlice";
 
 import {
@@ -28,6 +29,44 @@ import { motion } from "framer-motion";
 import { questionBlockMotion } from "../animations/surveyAnimation";
 import Footer from "../components/Footer";
 import LoadingScreen from "../components/LoadingScreen";
+
+// localStorage 관리 함수들
+interface SurveyAnswers {
+  whyContribute: string;
+  howContribute: string[];
+  proudProject: string;
+  proudProjectType: string;
+  confidentLangs: string[];
+  enjoyLangs: string[];
+  learnLangs: string[];
+  contribCount: string;
+  pastLinks: string[];
+}
+
+const saveSurveyAnswers = (userId: string, answers: SurveyAnswers) => {
+  try {
+    const existingData = JSON.parse(
+      localStorage.getItem("surveyAnswers") || "{}"
+    );
+    existingData[userId] = answers;
+    localStorage.setItem("surveyAnswers", JSON.stringify(existingData));
+    console.log(`💾 Survey answers saved for userId: ${userId}`);
+  } catch (error) {
+    console.error("❌ Error saving survey answers:", error);
+  }
+};
+
+const loadSurveyAnswers = (userId: string): SurveyAnswers | null => {
+  try {
+    const existingData = JSON.parse(
+      localStorage.getItem("surveyAnswers") || "{}"
+    );
+    return existingData[userId] || null;
+  } catch (error) {
+    console.error("❌ Error loading survey answers:", error);
+    return null;
+  }
+};
 
 // Classes for consistent styling
 const questionBlockClass =
@@ -101,6 +140,72 @@ const Survey = () => {
     pastLinks,
     loading: apiLoading, // usePostApi의 loading 상태 사용
   });
+
+  // userId 변경시 localStorage에서 설문 답변 로드
+  React.useEffect(() => {
+    if (!testUserId) {
+      // userId가 null이면 설문 답변도 무조건 초기화
+      dispatch(resetSurvey());
+      return;
+    }
+    const savedAnswers = loadSurveyAnswers(testUserId);
+    if (savedAnswers) {
+      // 저장된 답변이 있으면 Redux에 설정
+      dispatch(setWhyContribute(savedAnswers.whyContribute || ""));
+      dispatch(setHowContribute(savedAnswers.howContribute || []));
+      dispatch(setProudProject(savedAnswers.proudProject || ""));
+      dispatch(setProudProjectType(savedAnswers.proudProjectType || ""));
+      dispatch(setConfidentLangs(savedAnswers.confidentLangs || []));
+      dispatch(setEnjoyLangs(savedAnswers.enjoyLangs || []));
+      dispatch(setLearnLangs(savedAnswers.learnLangs || []));
+      dispatch(setContribCount(savedAnswers.contribCount || ""));
+      dispatch(setPastLinks(savedAnswers.pastLinks || [""]));
+    } else {
+      dispatch(resetSurvey());
+    }
+  }, [testUserId, dispatch]);
+
+  // 설문 답변 변경시 localStorage에 저장
+  React.useEffect(() => {
+    if (!testUserId) return; // userId 없으면 저장하지 않음
+    const currentAnswers = {
+      whyContribute,
+      howContribute,
+      proudProject,
+      proudProjectType,
+      confidentLangs,
+      enjoyLangs,
+      learnLangs,
+      contribCount,
+      pastLinks,
+    };
+    // 모든 답변이 초기값인지 확인 (초기 로드시 저장 방지)
+    const isInitialState =
+      !whyContribute &&
+      howContribute.length === 0 &&
+      !proudProject &&
+      !proudProjectType &&
+      confidentLangs.length === 0 &&
+      enjoyLangs.length === 0 &&
+      learnLangs.length === 0 &&
+      !contribCount &&
+      pastLinks.length === 1 &&
+      pastLinks[0] === "";
+    if (!isInitialState) {
+      saveSurveyAnswers(testUserId, currentAnswers);
+    }
+  }, [
+    testUserId,
+    whyContribute,
+    howContribute,
+    proudProject,
+    proudProjectType,
+    confidentLangs,
+    enjoyLangs,
+    learnLangs,
+    contribCount,
+    pastLinks,
+  ]);
 
   // Redux 상태를 백엔드 API 형태로 변환하는 함수
   const transformToApiFormat = () => {
