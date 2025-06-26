@@ -201,7 +201,7 @@ const OpenSourceList = () => {
 
   // 로딩 상태
   if (isLoading || apiLoading) {
-    return <LoadingScreen title="Loading your recommendations..." />;
+    return <LoadingScreen title="Finding new matches for you..." />;
   }
 
   // 에러 상태
@@ -266,10 +266,11 @@ const OpenSourceList = () => {
             recommendations
           </p>
           <GradientButton
-            onClick={() => navigate("/survey")}
-            className="px-6 py-2 rounded-lg text-white font-semibold transition-transform hover:scale-105"
+            onClick={handleRegenerate}
+            className="px-6 py-2 rounded-lg text-white font-semibold flex items-center"
+            disabled={isLoading || apiLoading}
           >
-            Take Survey
+            Find More
           </GradientButton>
         </div>
       )}{" "}
@@ -292,10 +293,44 @@ const OpenSourceList = () => {
             />
           </div>
         ))}
-      {/* Footer */}
-      <Footer />
-    </div>
+      </>
+    ) : (
+      // No repository page
+      <div className="w-full h-screen text-center flex flex-col items-center justify-center">
+        <div className="mb-4">
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <motion.path
+              {...emptyIconDrawMotion}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+        </div>
+        <h3 className="text-2xl font-medium text-white mb-2">
+          No recommendations yet
+        </h3>
+        <p className="text-text-gray-light text-sm mb-6">
+          Complete the survey to get personalized open source project recommendations
+        </p>
+        <GradientButton
+          onClick={() => navigate("/survey")}
+          className="px-6 py-2 rounded-lg text-white font-semibold transition-transform hover:scale-105"
+        >
+          Take Survey
+        </GradientButton>
+      </div>
+    )}
+
+    <Footer />
+  </div>
   );
-};
+}
 
 export default OpenSourceList;

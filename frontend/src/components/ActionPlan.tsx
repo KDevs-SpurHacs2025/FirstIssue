@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
+import LaunchIcon from '@mui/icons-material/Launch';
+
 interface ActionPlanProps {
   contributionDirections: Array<{
     number: number;
@@ -47,7 +49,7 @@ export default function ActionPlan({
   };
 
   return (
-    <div className="action-plan mb-4">
+    <div className="scrollbar-hidden action-plan mb-4">
       <h4
         className={`text-lg font-semibold text-white mb-4 transition-all duration-500 ease-out ${
           visibleSteps.size > 0
@@ -58,6 +60,11 @@ export default function ActionPlan({
         Action Plan
       </h4>
       <div className="space-y-3">
+        {contributionDirections.length === 0 ? (
+        <p className="text-xs text-text-gray">
+          No contribution directions available.
+        </p>
+      ) : (<>
         {/* Step 0: Explore the repo first */}
         <div
           className={`relative transition-all duration-500 ease-out transform ${
@@ -69,7 +76,7 @@ export default function ActionPlan({
           {/* Vertical line to connect to next step */}
           <div
             className="absolute left-4 top-8 w-0.5 bg-white bg-opacity-20"
-            style={{ height: "calc(100% + 1.5rem)" }}
+            style={{ height: "calc(100%)" }}
           />
 
           <div className="flex items-start">
@@ -120,17 +127,10 @@ export default function ActionPlan({
                       href={repoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
+                      className="inline-flex items-center gap-1 px-3 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700 transition-colors"
                     >
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
-                      </svg>
                       View Repository
+                      <LaunchIcon sx={{ width: 10, height: 10 }} />
                     </a>
                   )}
                 </div>
@@ -138,18 +138,6 @@ export default function ActionPlan({
             </div>
           </div>
         </div>
-
-        {/* Separator between Step 0 and other steps */}
-        {contributionDirections.length > 0 && visibleSteps.has(0) && (
-          <div
-            className={`my-3 border-t border-white border-opacity-10 transition-all duration-500 ease-out ${
-              contributionDirections.length > 0 &&
-              visibleSteps.has(contributionDirections[0]?.number)
-                ? "opacity-100 scale-x-100"
-                : "opacity-0 scale-x-0"
-            }`}
-          ></div>
-        )}
 
         {/* Existing contribution directions */}
         {contributionDirections.length > 0 &&
@@ -166,7 +154,7 @@ export default function ActionPlan({
               {index !== contributionDirections.length - 1 && (
                 <div
                   className="absolute left-4 top-8 w-0.5 bg-white bg-opacity-20"
-                  style={{ height: "calc(100% + 2rem)" }}
+                  style={{ height: "calc(100%)" }}
                 />
               )}
 
@@ -222,12 +210,8 @@ export default function ActionPlan({
               </div>
             </div>
           ))}
-
-        {contributionDirections.length === 0 && (
-          <p className="text-xs text-text-gray">
-            No contribution directions available.
-          </p>
-        )}
+      </>
+      )}
       </div>
     </div>
   );

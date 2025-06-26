@@ -75,6 +75,11 @@ const OpenSourceCard: React.FC<OpenSourceCardProps> = ({
         {diff}
       </span>
     ))}
+    <span className="px-2 py-0.5 rounded text-xs font-semibold shadow bg-blue-700/80 text-white"  
+    style={{
+          letterSpacing: "0.02em",
+          textShadow: "0 1px 4px rgba(0,0,0,0.10)",
+        }}>Good First Issue</span>
   </div>
 <span
   className="text-cyan-100 text-base font-bold ml-4"

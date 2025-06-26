@@ -3,6 +3,7 @@ import { useRecommendation } from "../hooks/useRedux";
 import Navbar from "../components/Navbar";
 import Chatbot from "../components/Chatbot";
 import ActionPlan from "../components/ActionPlan";
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 
 const OpenSourceDetail = () => {
   const { repoId } = useParams<{ repoId: string }>();
@@ -26,8 +27,9 @@ const OpenSourceDetail = () => {
         <div className="flex justify-between items-center mb-6 flex-shrink-0">
           <button
             onClick={() => window.history.back()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="text-white flex items-center gap-1 hover:opacity-90 transition-opacity duration-150"
           >
+            <KeyboardArrowLeftIcon fontSize="medium" />
             Back to List
           </button>
           <h2 className="text-white text-lg font-semibold absolute left-1/2 transform -translate-x-1/2">
@@ -40,7 +42,7 @@ const OpenSourceDetail = () => {
                 🧐
               </>
             ) : (
-              "Discover how to contribute to this repository"
+              "No Repository Found"
             )}
           </h2>
           <div></div>
