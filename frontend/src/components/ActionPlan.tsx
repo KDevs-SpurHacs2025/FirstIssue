@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 interface ActionPlanProps {
@@ -19,6 +19,23 @@ export default function ActionPlan({
     new Set([0, ...contributionDirections.map((direction) => direction.number)])
   );
 
+  // 애니메이션을 위한 visible steps 상태
+  const [visibleSteps, setVisibleSteps] = useState<Set<number>>(new Set());
+
+  // 컴포넌트가 마운트되면 스텝들을 순차적으로 보여주기
+  useEffect(() => {
+    const allSteps = [
+      0,
+      ...contributionDirections.map((direction) => direction.number),
+    ];
+
+    allSteps.forEach((stepNumber, index) => {
+      setTimeout(() => {
+        setVisibleSteps((prev) => new Set([...prev, stepNumber]));
+      }, index * 300); // 300ms 간격으로 나타남
+    });
+  }, [contributionDirections]);
+
   const toggleStep = (stepNumber: number) => {
     const newOpenSteps = new Set(openSteps);
     if (newOpenSteps.has(stepNumber)) {
@@ -31,10 +48,24 @@ export default function ActionPlan({
 
   return (
     <div className="action-plan mb-4">
-      <h4 className="text-lg font-semibold text-white mb-4">Action Plan</h4>
+      <h4
+        className={`text-lg font-semibold text-white mb-4 transition-all duration-500 ease-out ${
+          visibleSteps.size > 0
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-2"
+        }`}
+      >
+        Action Plan
+      </h4>
       <div className="space-y-3">
         {/* Step 0: Explore the repo first */}
-        <div className="relative">
+        <div
+          className={`relative transition-all duration-500 ease-out transform ${
+            visibleSteps.has(0)
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-4"
+          }`}
+        >
           {/* Vertical line to connect to next step */}
           <div
             className="absolute left-4 top-8 w-0.5 bg-white bg-opacity-20"
@@ -109,14 +140,28 @@ export default function ActionPlan({
         </div>
 
         {/* Separator between Step 0 and other steps */}
-        {contributionDirections.length > 0 && (
-          <div className="my-3 border-t border-white border-opacity-10"></div>
+        {contributionDirections.length > 0 && visibleSteps.has(0) && (
+          <div
+            className={`my-3 border-t border-white border-opacity-10 transition-all duration-500 ease-out ${
+              contributionDirections.length > 0 &&
+              visibleSteps.has(contributionDirections[0]?.number)
+                ? "opacity-100 scale-x-100"
+                : "opacity-0 scale-x-0"
+            }`}
+          ></div>
         )}
 
         {/* Existing contribution directions */}
         {contributionDirections.length > 0 &&
           contributionDirections.map((direction, index) => (
-            <div key={direction.number} className="relative mb-2">
+            <div
+              key={direction.number}
+              className={`relative mb-2 transition-all duration-500 ease-out transform ${
+                visibleSteps.has(direction.number)
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-4"
+              }`}
+            >
               {/* Vertical line (except for last item) - uses flex to fill space */}
               {index !== contributionDirections.length - 1 && (
                 <div
