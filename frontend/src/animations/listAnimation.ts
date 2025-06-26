@@ -14,6 +14,11 @@ export const emptyIconDrawMotion: MotionProps = {
 
 // Card hover scale animation
 export const cardHoverMotion: MotionProps = {
-  whileHover: { scale: 1.009 },
-  transition: { type: "spring", stiffness: 300, damping: 20 },
+    initial: { rotateY: 0, scale: 1 },
+  whileHover: {
+    rotateY: 12,
+    scale: 1.01,
+    transition: { type: "spring", stiffness: 180, damping: 18 }
+  },
+  whileTap: { scale: 0.98 }
 };

@@ -46,7 +46,7 @@ const OpenSourceCard: React.FC<OpenSourceCardProps> = ({
     >
       {/* Top: Repo Name & Difficulties (left), Percentage (right) */}
 
-<div className="flex flex-col md:flex-row md:items-center md:justify-between mb-1">
+<motion.div {...cardHoverMotion } className="flex flex-col md:flex-row md:items-center md:justify-between mb-1">
   <div className="flex items-center gap-3">
     {url ? (
       <a 
@@ -92,7 +92,7 @@ const OpenSourceCard: React.FC<OpenSourceCardProps> = ({
 >
   {percentage}% match
 </span>
-</div>
+</motion.div>
       {/* Dates */}
       <div className="flex flex-wrap gap-2 text-xs text-text-gray">
         <span>Created: {createdAt}</span>
@@ -122,12 +122,12 @@ const OpenSourceCard: React.FC<OpenSourceCardProps> = ({
       
       {/* Reason for Recommendation */}
         {hovered && (
-        <div className="absolute inset-0 bg-bg-black rounded-2xl flex flex-col items-center justify-center z-20 px-10 py-6 transition-all duration-300 ease-in-out">
-          <p className="text-text-gray-light text-sm font-semibold mb-2 text-center">
+        <div className="absolute inset-0 bg-gray-950/50 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center z-20 px-40 transition-all duration-300 ease-in-out">
+          <p className="text-white text-sm font-semibold mb-2 text-center">
             ✨ {reasonForRecommendation}
           </p>
           <p className="text-cyan-200 text-xs text-center mt-2">
-            <span className="font-bold">Click to view advanced insights and use the chatbot!</span>
+            <span className="font-medium ">Click to view advanced insights and use the chatbot!</span>
           </p>
         </div>
       )}
