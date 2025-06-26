@@ -49,7 +49,7 @@ export default function ActionPlan({
   };
 
   return (
-    <div className="action-plan mb-4">
+    <div className="scrollbar-hidden action-plan mb-4">
       <h4
         className={`text-lg font-semibold text-white mb-4 transition-all duration-500 ease-out ${
           visibleSteps.size > 0
