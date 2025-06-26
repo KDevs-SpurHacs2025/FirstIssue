@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import logger from '../utils/logger.js'; // Assuming you have this logger utility
 import Recommendation from '../models/Recommendation.js';
 import RepoAnalysisResult from '../models/RepoAnalysisResult.js';
+import OpenSourceSurvey from '../models/OpenSourceSurvey.js';
 
 // Load environment variables (dotenv will look for .env in the current working directory)
 dotenv.config();
@@ -46,13 +47,18 @@ export const chatbotController = async (req: Request, res: Response): Promise<vo
     }
 
     try {
-        // 1. 이전 추천 및 분석 결과 조회 (userId, rank가 모두 있을 때만)
+        // 1. 이전 추천, 분석 결과, 설문조사 결과 조회 (userId, rank가 모두 있을 때만)
         let prevRecommendation = null;
         let repoAnalyses: any[] = [];
+        let userSurvey = null;
         if (userId && rank !== undefined) {
             prevRecommendation = await Recommendation.findOne({ userId, Rank: rank });
             repoAnalyses = await RepoAnalysisResult.find({ userId });
+            userSurvey = await OpenSourceSurvey.findOne({ userId });
         }
+        logger.info(`Previous recommendation for userId ${userId} and rank ${rank}:`, prevRecommendation);
+        logger.info(`Previous repo analyses for userId ${userId}:`, repoAnalyses);
+        logger.info(`OpenSourceSurvey for userId ${userId}:`, userSurvey);
 
         // 2. AI 프롬프트에 맥락 포함
         let contextPrompt = '';
@@ -61,6 +67,9 @@ export const chatbotController = async (req: Request, res: Response): Promise<vo
         }
         if (repoAnalyses && repoAnalyses.length > 0) {
             contextPrompt += `User's repo analysis results:\n${JSON.stringify(repoAnalyses, null, 2)}\n`;
+        }
+        if (userSurvey) {
+            contextPrompt += `User's open source survey responses:\n${JSON.stringify(userSurvey, null, 2)}\n`;
         }
         if (contextPrompt) {
             contextPrompt += '\nBased on this context, continue the conversation below.\n';
