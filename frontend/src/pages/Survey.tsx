@@ -22,13 +22,11 @@ import {
 import {
   setRepositories,
   setLoading,
-  setError,
   clearRecommendations,
 } from "../store/slices/recommendationSlice";
 import { motion } from "framer-motion";
 import { questionBlockMotion } from "../animations/surveyAnimation";
 import Footer from "../components/Footer";
-import LinearProgress from "@mui/material/LinearProgress";
 import LoadingScreen from "../components/LoadingScreen";
 
 // Classes for consistent styling
@@ -316,7 +314,7 @@ const Survey = () => {
             >
               <label
                 id="why-label"
-                className="font-semibold text-white mb-4 block text-base flex items-center gap-2"
+                className="font-semibold text-white mb-4 text-base flex items-center gap-2"
               >
                 <span role="img" aria-label="lightbulb">
                   💡
@@ -350,7 +348,7 @@ const Survey = () => {
             >
               <label
                 id="how-label"
-                className="font-semibold text-white mb-4 block text-base flex items-center gap-2"
+                className="font-semibold text-white mb-4 text-base flex items-center gap-2"
               >
                 <span role="img" aria-label="tools">
                   🛠️
@@ -388,7 +386,7 @@ const Survey = () => {
             >
               <label
                 id="proud-label"
-                className="font-semibold text-white mb-4 block text-base flex items-center gap-2"
+                className="font-semibold text-white mb-4 text-base flex items-center gap-2"
               >
                 <span role="img" aria-label="trophy">
                   🏆
@@ -434,7 +432,7 @@ const Survey = () => {
             >
               <label
                 id="confident-label"
-                className="font-semibold text-white mb-4 block text-base flex items-center gap-2"
+                className="font-semibold text-white mb-4 text-base flex items-center gap-2"
               >
                 <span role="img" aria-label="rocket">
                   🚀
@@ -463,7 +461,7 @@ const Survey = () => {
             >
               <label
                 id="enjoy-label"
-                className="font-semibold text-white mb-4 block text-base flex items-center gap-2"
+                className="font-semibold text-white mb-4 text-base flex items-center gap-2"
               >
                 <span role="img" aria-label="heart">
                   ❤️
@@ -492,7 +490,7 @@ const Survey = () => {
             >
               <label
                 id="learn-label"
-                className="font-semibold text-white mb-4 block text-base flex items-center gap-2"
+                className="font-semibold text-white mb-4 text-base flex items-center gap-2"
               >
                 <span role="img" aria-label="books">
                   📚
@@ -521,7 +519,7 @@ const Survey = () => {
             >
               <label
                 id="count-label"
-                className="font-semibold text-white mb-4 block text-base flex items-center gap-2"
+                className="font-semibold text-white mb-4 text-base flex items-center gap-2"
               >
                 <span role="img" aria-label="repeat">
                   🔁
@@ -555,7 +553,7 @@ const Survey = () => {
             >
               <label
                 id="past-label"
-                className="font-semibold text-white mb-4 block text-base flex items-center gap-2"
+                className="font-semibold text-white mb-4 text-base flex items-center gap-2"
               >
                 <span role="img" aria-label="link">
                   🔗
