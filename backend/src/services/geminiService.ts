@@ -10,8 +10,8 @@ export type SkillLevel = "Novice" | "Beginner" | "Intermediate" | "Advanced" | "
 export interface RepoAnalysisResult {
   devDirection: string;
   languages: { name: string; skill: SkillLevel }[];
-  frameworks: { name: string; skill: SkillLevel }[];
-  packages: { name: string; skill: SkillLevel }[];
+  frameworksUsed?: { name: string; skill: SkillLevel }[];
+  packagesUsed?: { name: string; skill: SkillLevel }[];
   habits: { strengths: string[]; improvements: string[] };
   overallSkillLevel: SkillLevel;
   error?: string;
@@ -55,7 +55,7 @@ export async function analyzeGitRepoProfile(
   if (!apiKey) {
     logger.error('Error: GEMINI_API_KEY is not set in environment variables for repo analysis.');
     return {
-      devDirection: 'N/A', languages: [], frameworks: [], packages: [],
+      devDirection: 'N/A', languages: [],
       habits: { strengths: [], improvements: [] }, overallSkillLevel: 'Novice',
       error: 'Failed to analyze with Gemini',
       detail: 'API Key not configured.',
@@ -75,9 +75,13 @@ Given the following public GitHub repository URL and its type, analyze the repos
 - Identified Core Languages: (List languages used, with inferred skill level: Novice | Beginner | Intermediate | Advanced | Expert)
 - Identified Core Frameworks: (List frameworks used, with inferred skill level: Novice | Beginner | Intermediate | Advanced | Expert)
 - Key Packages/Libraries Used: (List major packages/libraries, with inferred usage skill level: Novice | Beginner | Intermediate | Advanced | Expert. Focus on those that reveal specific domain knowledge.)
+- List of frameworks the developer has experience using in this repository ("frameworksUsed").
+- List of packages the developer has experience using in this repository ("packagesUsed").
 - Development Habits:
     - Strengths: (List specific strong points in coding style, project structure, problem-solving, etc.)
     - Areas for Improvement: (List specific areas where skills or practices could be enhanced, e.g., testing, documentation, performance optimization, error handling.)
+    - Frameworks Used: (List the frameworks the developer has experience using in this repository.)
+    - Packages Used: (List the packages the developer has experience using in this repository.)
 - Overall Skill Level: (A single summarized skill level for the developer based on all findings: Novice | Beginner | Intermediate | Advanced | Expert)
 
 Repository URL: ${repoUrl}
@@ -88,7 +92,9 @@ Return the result as a JSON object with the following structure:
   "devDirection": "string",
   "languages": [{ "name": "string", "skill": "Novice | Beginner | Intermediate | Advanced | Expert" }],
   "frameworks": [{ "name": "string", "skill": "Novice | Beginner | Intermediate | Advanced | Expert" }],
+  "frameworksUsed": ["string"],
   "packages": [{ "name": "string", "skill": "Novice | Beginner | Intermediate | Advanced | Expert" }],
+  "packagesUsed": ["string"],
   "habits": { "strengths": ["string"], "improvements": ["string"] },
   "overallSkillLevel": "Novice | Beginner | Intermediate | Advanced | Expert"
 }
@@ -98,7 +104,7 @@ Return the result as a JSON object with the following structure:
     if (!result || !result.response || !result.response.text) {
       logger.error('Gemini API did not return a valid response for repo analysis.');
       return {
-        devDirection: 'N/A', languages: [], frameworks: [], packages: [],
+        devDirection: 'N/A', languages: [],
         habits: { strengths: [], improvements: [] }, overallSkillLevel: 'Novice',
         error: 'Failed to analyze with Gemini',
         detail: 'Invalid response from Gemini API',
@@ -117,7 +123,7 @@ Return the result as a JSON object with the following structure:
     } catch (parseError: any) {
       logger.error(`Failed to parse Gemini API response for ${repoUrl} as JSON:`, parseError);
       return {
-        devDirection: 'N/A', languages: [], frameworks: [], packages: [],
+        devDirection: 'N/A', languages: [],
         habits: { strengths: [], improvements: [] }, overallSkillLevel: 'Novice',
         error: 'Failed to parse Gemini response',
         detail: parseError.message,
@@ -129,7 +135,7 @@ Return the result as a JSON object with the following structure:
   } catch (err: any) {
     logger.error(`Error calling Gemini API for repo ${repoUrl}:`, err.message);
     return {
-      devDirection: 'N/A', languages: [], frameworks: [], packages: [],
+      devDirection: 'N/A', languages: [],
       habits: { strengths: [], improvements: [] }, overallSkillLevel: 'Novice',
       error: 'Failed to analyze with Gemini',
       detail: err.message,
@@ -268,6 +274,7 @@ AI-based Analysis of User's Public Git Repositories:
 // This section contains an array of JSON objects, where each object is the analysis result for a user's public repository.
 // Each analysis object will strictly follow the structure defined in analyzeGitRepoProfile function's prompt,
 // including 'Novice | Beginner | Intermediate | Advanced | Expert' for skill levels.
+// Each object also includes lists of frameworks and packages the developer has experience using in that repository (fields: "frameworksUsed", "packagesUsed").
 ${repoAnalysisSummary}
 
 You must provide 5 recommendations, each with the required fields. The recommendations should be diverse and cover different areas of open source contribution, such as documentation, code contributions, testing, etc. Ensure that the recommendations are tailored to the user's skills and interests, and that the ReasonForRecommendation field always references the user's public repos, their content, and the AI-based repo analysis.

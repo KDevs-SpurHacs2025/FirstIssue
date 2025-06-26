@@ -61,6 +61,15 @@ export const getOpenSourceRecommendations = async (req: Request, res: Response):
 
         // import RepoAnalysisResult model
         if (repoAnalyses && repoAnalyses.length > 0) {
+            // packagesUsed/frameworksUsed: string[] → { name, skill }[] 변환
+            repoAnalyses.forEach((analysis) => {
+                if (Array.isArray(analysis.packagesUsed) && typeof analysis.packagesUsed[0] === 'string') {
+                    analysis.packagesUsed = (analysis.packagesUsed as unknown as string[]).map(name => ({ name, skill: 'Novice' }));
+                }
+                if (Array.isArray(analysis.frameworksUsed) && typeof analysis.frameworksUsed[0] === 'string') {
+                    analysis.frameworksUsed = (analysis.frameworksUsed as unknown as string[]).map(name => ({ name, skill: 'Novice' }));
+                }
+            });
             const bulkOps = repoAnalyses.map((analysis, idx) => ({
                 updateOne: {
                     filter: { userId, repoUrl: analysis.repoUrl },

@@ -7,8 +7,8 @@ export interface IRepoAnalysisResult extends Document {
   repoType?: string;
   devDirection: string;
   languages: { name: string; skill: SkillLevel }[];
-  frameworks: { name: string; skill: SkillLevel }[];
-  packages: { name: string; skill: SkillLevel }[];
+  frameworksUsed: { name: string; skill: SkillLevel }[];
+  packagesUsed: { name: string; skill: SkillLevel }[];
   habits: { strengths: string[]; improvements: string[] };
   overallSkillLevel: SkillLevel;
   error?: string;
@@ -24,8 +24,8 @@ const RepoAnalysisResultSchema: Schema = new Schema(
     repoType: { type: String },
     devDirection: { type: String },
     languages: { type: [ { name: String, skill: String } ] },
-    frameworks: { type: [ { name: String, skill: String } ] },
-    packages: { type: [ { name: String, skill: String } ] },
+    frameworksUsed: { type: [ { name: String, skill: String } ] },
+    packagesUsed: { type: [ { name: String, skill: String } ] },
     habits: {
       strengths: { type: [String] },
       improvements: { type: [String] }
