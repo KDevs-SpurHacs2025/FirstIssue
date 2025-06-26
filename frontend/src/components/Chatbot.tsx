@@ -12,14 +12,74 @@ interface ChatbotProps {
 }
 
 const Chatbot: React.FC<ChatbotProps> = ({ userId, repoId }) => {
-  const [messages, setMessages] = useState<Message[]>([
-    { id: 1, sender: "bot", text: "Hello! How can I assist you today?" },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [userInput, setUserInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const BACKEND_API_URL = "http://localhost:3001/api/chatbot/message";
+
+  // 예시 질문들
+  const exampleQuestions = [
+    "Why was I matched with this repository?🤔",
+    "What should I do first?\n Give me specific details about the action plan. 🚀",
+    "What's the latest status and recent activity of this repository? 🆕",
+  ];
+
+  // 예시 질문 클릭 핸들러
+  const handleExampleClick = async (question: string) => {
+    setUserInput(question);
+
+    // 바로 전송
+    addMessage("user", question);
+    setUserInput("");
+    setIsTyping(true);
+
+    let typingMessageId: number | null = null;
+    try {
+      typingMessageId = addMessage("bot", "Typing...");
+
+      const body = { message: question, userId, rank: repoId };
+      const response = await fetch(BACKEND_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `HTTP error! Status: ${response.status}, Details: ${errorText}`
+        );
+      }
+
+      const data = await response.json();
+
+      if (data.success === true && typeof data.response === "string") {
+        updateMessage(typingMessageId, data.response);
+      } else {
+        console.warn("Backend response structure unexpected:", data);
+        updateMessage(
+          typingMessageId,
+          "Sorry, the AI response was unexpected."
+        );
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      if (typingMessageId) {
+        updateMessage(
+          typingMessageId,
+          "Oops! Something went wrong. Please try again."
+        );
+      } else {
+        addMessage("bot", "Oops! Something went wrong. Please try again.");
+      }
+    } finally {
+      setIsTyping(false);
+    }
+  };
 
   // Auto-scroll to bottom when new messages are added
   useEffect(() => {
@@ -118,19 +178,46 @@ const Chatbot: React.FC<ChatbotProps> = ({ userId, repoId }) => {
   return (
     <div className="bg-blue-light border border-white border-opacity-10 rounded-lg h-full flex flex-col">
       <div className="flex-1 p-4 border-b border-white border-opacity-10 overflow-y-auto">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`mb-3 p-3 rounded-lg max-w-[80%] ${
-              message.sender === "user"
-                ? "bg-blue-600 text-white ml-auto"
-                : "bg-white bg-opacity-10 text-gray-300 mr-auto"
-            }`}
-            dangerouslySetInnerHTML={{
-              __html: formatMessageText(message.text),
-            }}
-          />
-        ))}
+        {messages.length === 0 ? (
+          // 예시 질문들 표시
+          <div className="flex flex-col items-center justify-center h-full">
+            <div className="text-center mb-8">
+              <h3 className="text-xl font-semibold text-white mb-2">
+                How can I help you contribute?
+              </h3>
+              <p className="text-gray-400 text-sm">
+                Choose a question below or type your own
+              </p>
+            </div>
+            <div className="space-y-3 w-full max-w-md">
+              {exampleQuestions.map((question, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleExampleClick(question)}
+                  className="w-full p-3 text-left bg-white bg-opacity-10 hover:bg-opacity-20 border border-white border-opacity-20 rounded-lg text-gray-300 transition-all duration-200 hover:text-white"
+                  dangerouslySetInnerHTML={{
+                    __html: question.replace(/\n/g, "<br>"),
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
+          // 기존 메시지들 표시
+          messages.map((message) => (
+            <div
+              key={message.id}
+              className={`mb-3 p-3 rounded-lg max-w-[80%] ${
+                message.sender === "user"
+                  ? "bg-blue-600 text-white ml-auto"
+                  : "bg-white bg-opacity-10 text-gray-300 mr-auto"
+              }`}
+              dangerouslySetInnerHTML={{
+                __html: formatMessageText(message.text),
+              }}
+            />
+          ))
+        )}
         <div ref={messagesEndRef} />
       </div>
 
