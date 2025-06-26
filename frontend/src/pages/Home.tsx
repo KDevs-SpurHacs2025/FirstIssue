@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser, useAppDispatch } from "../hooks/useRedux";
 import { useGetApi } from "../hooks/useGetApi";
-import { setTestUserId } from "../store/slices/userSlice";
+import { setTestUserId, clearUser } from "../store/slices/userSlice";
 import { motion } from "framer-motion";
 import GradientHero from '../components/GradientHero';
 import {
@@ -29,9 +29,31 @@ const Home = () => {
   const fullTitle = "Find Your First GitHub\nContribution";
   const [displayedTitle, typingDone] = useHomeTypingAnimation(fullTitle, 50);
 
+  // localStorage에서 특정 userId의 설문 답변 제거하는 함수
+  const removeSurveyAnswers = (userId: string) => {
+    try {
+      const existingData = JSON.parse(
+        localStorage.getItem("surveyAnswers") || "{}"
+      );
+      if (existingData[userId]) {
+        delete existingData[userId];
+        localStorage.setItem("surveyAnswers", JSON.stringify(existingData));
+        console.log(`🗑️ Survey answers removed for userId: ${userId}`);
+      }
+    } catch (error) {
+      console.error("❌ Error removing survey answers:", error);
+    }
+  };
+
   // 개발용 - userId 초기화
   const resetUserId = () => {
-    dispatch(setTestUserId(""));
+    if (testUserId) {
+      // localStorage에서 해당 userId의 설문 답변 제거
+      removeSurveyAnswers(testUserId);
+    }
+
+    // Redux에서 userId 초기화
+    dispatch(clearUser());
     console.log("🗑️ userId 초기화됨");
   };
 
@@ -352,7 +374,7 @@ const Home = () => {
       {/* Footer */}
       <Footer />
       {/* 개발용 - userId 초기화 버튼 (Footer 하단 배치) */}
-      {testUserId && (
+      {/* {testUserId && (
         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mx-4 my-4 flex justify-between items-center">
           <span className="text-sm">🔧 개발용 | 현재 userId: {testUserId}</span>
           <button
@@ -362,7 +384,7 @@ const Home = () => {
             초기화
           </button>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
