@@ -116,109 +116,44 @@ const Chatbot: React.FC<ChatbotProps> = ({ userId, repoId }) => {
   };
 
   return (
-    <div
-      style={{
-        fontFamily: "Arial, sans-serif",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        backgroundColor: "transparent",
-        margin: 0,
-        padding: 0,
-        boxSizing: "border-box",
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: "#fff",
-          borderRadius: "8px",
-          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            padding: "15px",
-            flex: 1,
-            overflowY: "auto",
-            borderBottom: "1px solid #eee",
-          }}
-        >
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              style={{
-                marginBottom: "10px",
-                padding: "8px 12px",
-                borderRadius: "5px",
-                maxWidth: "80%",
-                backgroundColor:
-                  message.sender === "user" ? "#e1ffc7" : "#f1f0f0",
-                alignSelf:
-                  message.sender === "user" ? "flex-end" : "flex-start",
-                marginLeft: message.sender === "user" ? "auto" : "0",
-                marginRight: message.sender === "user" ? "0" : "auto",
-              }}
-              dangerouslySetInnerHTML={{
-                __html: formatMessageText(message.text),
-              }}
-            />
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            padding: "15px",
-            gap: "10px",
-            flexShrink: 0,
-          }}
-        >
-          <input
-            type="text"
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Type your message..."
-            style={{
-              flexGrow: 1,
-              padding: "10px",
-              border: "1px solid #ccc",
-              borderRadius: "5px",
-              outline: "none",
+    <div className="bg-blue-light border border-white border-opacity-10 rounded-lg h-full flex flex-col">
+      <div className="flex-1 p-4 border-b border-white border-opacity-10 overflow-y-auto">
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`mb-3 p-3 rounded-lg max-w-[80%] ${
+              message.sender === "user"
+                ? "bg-blue-600 text-white ml-auto"
+                : "bg-white bg-opacity-10 text-gray-300 mr-auto"
+            }`}
+            dangerouslySetInnerHTML={{
+              __html: formatMessageText(message.text),
             }}
           />
-          <button
-            onClick={sendMessage}
-            disabled={isTyping}
-            style={{
-              padding: "10px 15px",
-              backgroundColor: isTyping ? "#6c757d" : "#007bff",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: isTyping ? "not-allowed" : "pointer",
-            }}
-            onMouseOver={(e) => {
-              if (!isTyping) {
-                (e.target as HTMLButtonElement).style.backgroundColor =
-                  "#0056b3";
-              }
-            }}
-            onMouseOut={(e) => {
-              if (!isTyping) {
-                (e.target as HTMLButtonElement).style.backgroundColor =
-                  "#007bff";
-              }
-            }}
-          >
-            Send
-          </button>
-        </div>
+        ))}
+        <div ref={messagesEndRef} />
+      </div>
+
+      <div className="flex gap-3 p-4 flex-shrink-0">
+        <input
+          type="text"
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
+          onKeyPress={handleKeyPress}
+          placeholder="Type your message..."
+          className="flex-1 px-3 py-2 bg-black bg-opacity-20 border border-white border-opacity-20 rounded-lg text-white placeholder-gray-400 outline-none focus:border-blue-500"
+        />
+        <button
+          onClick={sendMessage}
+          disabled={isTyping}
+          className={`px-4 py-2 rounded-lg text-white font-medium transition-colors ${
+            isTyping
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
+        >
+          Send
+        </button>
       </div>
     </div>
   );
