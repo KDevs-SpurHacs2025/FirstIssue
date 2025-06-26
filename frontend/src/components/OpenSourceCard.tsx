@@ -11,6 +11,7 @@ interface OpenSourceCardProps {
   languages: string[];
   difficulties: string[];
   description: string;
+  reasonForRecommendation?: string; // New prop for recommendation reason
   url?: string; // Repository URL
   contributionDirections?: string[];
   onAdvancedInsights?: (repoId: number) => void;
@@ -25,6 +26,7 @@ const OpenSourceCard: React.FC<OpenSourceCardProps> = ({
   languages,
   difficulties,
   description,
+  reasonForRecommendation,
   url,
   onAdvancedInsights,
 }) => {
@@ -40,7 +42,19 @@ const OpenSourceCard: React.FC<OpenSourceCardProps> = ({
 
 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-1">
   <div className="flex items-center gap-3">
-    <span className="text-xl font-bold text-white">{repoName}</span>
+    {url ? (
+      <a 
+        href={url} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="text-xl font-bold text-white hover:text-cyan-200 transition-colors"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {repoName}
+      </a>
+    ) : (
+      <span className="text-xl font-bold text-white">{repoName}</span>
+    )}
     {/* Improved Difficulty Badge(s) */}
     {difficulties.map((diff, idx) => (
       <span
@@ -98,7 +112,15 @@ const OpenSourceCard: React.FC<OpenSourceCardProps> = ({
         ))}
       </div>
       {/* Description */}
-      <div className="text-sm text-text-gray-light">{description}</div>
+      <div className="text-sm text-text-gray-light mb-3">{description}</div>
+      
+      {/* Reason for Recommendation */}
+      {reasonForRecommendation && (
+        <div className="border-t border-blue-900/20 pt-3">
+          <p className="text-xs font-semibold text-cyan-200 mb-1">Why this matches you:</p>
+          <p className="text-xs text-text-gray-light italic">{reasonForRecommendation}</p>
+        </div>
+      )}
     </motion.div>
   );
 };

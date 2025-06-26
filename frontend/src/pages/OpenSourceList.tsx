@@ -32,13 +32,16 @@ const OpenSourceList = () => {
       repoId: repo.id,
       repoName: repo.name,
       percentage: repo.stars, // Suitability Score를 percentage로 사용
-      createdAt: repo.lastActivity.split("T")[0], // ISO 날짜를 YYYY-MM-DD 형태로
+      createdAt: repo.createdAt
+        ? repo.createdAt.split("T")[0]
+        : repo.lastActivity.split("T")[0], // Created Date 우선 사용
       updatedAt: repo.lastActivity.split("T")[0],
       languages: repo.language.split(", "), // 문자열을 배열로 분할
       difficulties: [
         repo.difficulty.charAt(0).toUpperCase() + repo.difficulty.slice(1),
       ],
       description: repo.description || "No description available.",
+      reasonForRecommendation: repo.reasonForRecommendation || "", // Add reason for recommendation
       url: repo.url, // Repository URL 추가
     }));
   };
@@ -165,7 +168,8 @@ const OpenSourceList = () => {
                 forks: 0,
                 issues: 0,
                 url: (repoObj["Repo URL"] || "") as string,
-                goodFirstIssues: repoObj["GoodFirstIssue"] ? 1 : 0,
+                goodFirstIssues: Boolean(repoObj["GoodFirstIssue"]),
+                createdAt: (repoObj["Created Date"] || "") as string,
                 lastActivity: (repoObj["Latest Updated Date"] ||
                   new Date().toISOString()) as string,
                 difficulty: (repoObj["Difficulties"] || "beginner") as
@@ -173,6 +177,11 @@ const OpenSourceList = () => {
                   | "intermediate"
                   | "advanced",
                 contributionDirections,
+                reasonForRecommendation: (repoObj["ReasonForRecommendation"] ||
+                  "") as string,
+                currentStatusDevelopmentDirection: (repoObj[
+                  "CurrentStatusDevelopmentDirection"
+                ] || "") as string,
               };
             }
           );
@@ -215,15 +224,47 @@ const OpenSourceList = () => {
   }
 
   return (
-  <div className="w-full h-auto bg-bg-black pt-[120px]">
-    <Navbar />
-    {/* Show header, button, and cards only if there are repositories */}
-    {repositories.length > 0 ? (
-      <>
-        <div className="flex justify-between items-center mb-8 px-40">
-          <h1 className="text-3xl font-bold text-white">
-            Top Projects for You
-          </h1>
+    <div className="w-full h-auto bg-bg-black pt-[120px]">
+      {/* Navbar and Header */}
+      <Navbar />
+      <div className="flex justify-center items-center mb-8 px-40">
+        <h1 className="text-3xl font-bold text-white">Top Projects for You</h1>
+      </div>
+      <div className="flex justify-end items-center mb-6 px-40">
+        <GradientButton
+          onClick={handleRegenerate}
+          className="px-6 py-2 rounded-lg text-white font-semibold flex items-center"
+          disabled={isLoading || apiLoading}
+        >
+          Find More
+        </GradientButton>
+      </div>
+      {/* No repository page */}
+      {repositories.length === 0 && (
+        <div className="text-center py-48">
+          <div className="mb-4">
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <motion.path
+                {...emptyIconDrawMotion}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-2xl font-medium text-white mb-2">
+            No recommendations yet
+          </h3>
+          <p className="text-text-gray-light text-sm mb-6">
+            Complete the survey to get personalized open source project
+            recommendations
+          </p>
           <GradientButton
             onClick={handleRegenerate}
             className="px-6 py-2 rounded-lg text-white font-semibold flex items-center"
@@ -232,9 +273,12 @@ const OpenSourceList = () => {
             Find More
           </GradientButton>
         </div>
-        {cards.map((card, idx) => (
-          <div className="w-full h-auto px-40" key={card.repoName + idx}>
+      )}{" "}
+      {repositories.length > 0 &&
+        cards.map((card, idx) => (
+          <div className="w-full h-auto px-40">
             <OpenSourceCard
+              key={card.repoName + idx}
               repoId={card.repoId}
               repoName={card.repoName}
               percentage={card.percentage}
@@ -243,6 +287,7 @@ const OpenSourceList = () => {
               languages={card.languages}
               difficulties={card.difficulties}
               description={card.description}
+              reasonForRecommendation={card.reasonForRecommendation}
               url={card.url}
               onAdvancedInsights={handleAdvancedInsights}
             />
