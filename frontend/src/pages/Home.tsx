@@ -351,7 +351,7 @@ const Home = () => {
       {/* Footer */}
       <Footer />
       {/* 개발용 - userId 초기화 버튼 (Footer 하단 배치) */}
-      {testUserId && (
+      {/* {testUserId && (
         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mx-4 my-4 flex justify-between items-center">
           <span className="text-sm">🔧 개발용 | 현재 userId: {testUserId}</span>
           <button
@@ -361,7 +361,7 @@ const Home = () => {
             초기화
           </button>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
