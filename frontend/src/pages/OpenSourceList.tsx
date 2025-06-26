@@ -32,13 +32,16 @@ const OpenSourceList = () => {
       repoId: repo.id,
       repoName: repo.name,
       percentage: repo.stars, // Suitability Score를 percentage로 사용
-      createdAt: repo.lastActivity.split("T")[0], // ISO 날짜를 YYYY-MM-DD 형태로
+      createdAt: repo.createdAt
+        ? repo.createdAt.split("T")[0]
+        : repo.lastActivity.split("T")[0], // Created Date 우선 사용
       updatedAt: repo.lastActivity.split("T")[0],
       languages: repo.language.split(", "), // 문자열을 배열로 분할
       difficulties: [
         repo.difficulty.charAt(0).toUpperCase() + repo.difficulty.slice(1),
       ],
       description: repo.description || "No description available.",
+      reasonForRecommendation: repo.reasonForRecommendation || "", // Add reason for recommendation
       url: repo.url, // Repository URL 추가
     }));
   };
@@ -165,7 +168,8 @@ const OpenSourceList = () => {
                 forks: 0,
                 issues: 0,
                 url: (repoObj["Repo URL"] || "") as string,
-                goodFirstIssues: repoObj["GoodFirstIssue"] ? 1 : 0,
+                goodFirstIssues: Boolean(repoObj["GoodFirstIssue"]),
+                createdAt: (repoObj["Created Date"] || "") as string,
                 lastActivity: (repoObj["Latest Updated Date"] ||
                   new Date().toISOString()) as string,
                 difficulty: (repoObj["Difficulties"] || "beginner") as
@@ -173,6 +177,11 @@ const OpenSourceList = () => {
                   | "intermediate"
                   | "advanced",
                 contributionDirections,
+                reasonForRecommendation: (repoObj["ReasonForRecommendation"] ||
+                  "") as string,
+                currentStatusDevelopmentDirection: (repoObj[
+                  "CurrentStatusDevelopmentDirection"
+                ] || "") as string,
               };
             }
           );
@@ -219,21 +228,17 @@ const OpenSourceList = () => {
       {/* Navbar and Header */}
       <Navbar />
       <div className="flex justify-center items-center mb-8 px-40">
-        <h1 className="text-3xl font-bold text-white">
-          Top Projects for You
-        </h1>
+        <h1 className="text-3xl font-bold text-white">Top Projects for You</h1>
       </div>
-         <div className="flex justify-end items-center mb-6 px-40">
-           <GradientButton
+      <div className="flex justify-end items-center mb-6 px-40">
+        <GradientButton
           onClick={handleRegenerate}
           className="px-6 py-2 rounded-lg text-white font-semibold flex items-center"
           disabled={isLoading || apiLoading}
         >
           Find More
-          </GradientButton>
-         </div>
-
-  
+        </GradientButton>
+      </div>
       {/* No repository page */}
       {repositories.length === 0 && (
         <div className="text-center py-48">
@@ -270,20 +275,21 @@ const OpenSourceList = () => {
       )}{" "}
       {repositories.length > 0 &&
         cards.map((card, idx) => (
-         <div className="w-full h-auto px-40">
-           <OpenSourceCard
-            key={card.repoName + idx}
-            repoId={card.repoId}
-            repoName={card.repoName}
-            percentage={card.percentage}
-            createdAt={card.createdAt}
-            updatedAt={card.updatedAt}
-            languages={card.languages}
-            difficulties={card.difficulties}
-            description={card.description}
-            url={card.url}
-            onAdvancedInsights={handleAdvancedInsights}
-          />
+          <div className="w-full h-auto px-40">
+            <OpenSourceCard
+              key={card.repoName + idx}
+              repoId={card.repoId}
+              repoName={card.repoName}
+              percentage={card.percentage}
+              createdAt={card.createdAt}
+              updatedAt={card.updatedAt}
+              languages={card.languages}
+              difficulties={card.difficulties}
+              description={card.description}
+              reasonForRecommendation={card.reasonForRecommendation}
+              url={card.url}
+              onAdvancedInsights={handleAdvancedInsights}
+            />
           </div>
         ))}
       {/* Footer */}

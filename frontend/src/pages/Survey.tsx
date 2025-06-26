@@ -28,9 +28,8 @@ import {
 import { motion } from "framer-motion";
 import { questionBlockMotion } from "../animations/surveyAnimation";
 import Footer from "../components/Footer";
-import LinearProgress from '@mui/material/LinearProgress';
+import LinearProgress from "@mui/material/LinearProgress";
 import LoadingScreen from "../components/LoadingScreen";
-
 
 // Classes for consistent styling
 const questionBlockClass =
@@ -236,7 +235,8 @@ const Survey = () => {
                   repoObj["html_url"] ||
                   repoObj["url"] ||
                   "") as string,
-                goodFirstIssues: repoObj["GoodFirstIssue"] ? 1 : 0,
+                goodFirstIssues: Boolean(repoObj["GoodFirstIssue"]),
+                createdAt: (repoObj["Created Date"] || "") as string,
                 lastActivity: (repoObj["Latest Updated Date"] ||
                   repoObj["updated_at"] ||
                   repoObj["pushed_at"] ||
@@ -250,48 +250,12 @@ const Survey = () => {
                   title: string;
                   description: string;
                 }>,
+                reasonForRecommendation: (repoObj["ReasonForRecommendation"] ||
+                  "") as string,
+                currentStatusDevelopmentDirection: (repoObj[
+                  "CurrentStatusDevelopmentDirection"
+                ] || "") as string,
               };
-
-              // 추가적인 선택적 필드들 파싱
-              if (repoObj["forks_count"])
-                repository.forks = parseInt(repoObj["forks_count"] as string);
-              if (repoObj["open_issues_count"])
-                repository.issues = parseInt(
-                  repoObj["open_issues_count"] as string
-                );
-              if (repoObj["watchers_count"])
-                repository.watchers = parseInt(
-                  repoObj["watchers_count"] as string
-                );
-              if (repoObj["owner"]) {
-                const ownerObj = repoObj["owner"] as Record<string, unknown>;
-                repository.owner = ownerObj?.login || repoObj["owner"];
-              }
-              if (repoObj["license"]) {
-                const licenseObj = repoObj["license"] as Record<
-                  string,
-                  unknown
-                >;
-                repository.license = licenseObj?.name || repoObj["license"];
-              }
-              if (repoObj["topics"] && Array.isArray(repoObj["topics"]))
-                repository.topics = repoObj["topics"] as string[];
-              if (repoObj["primary_language"])
-                repository.primaryLanguage = repoObj[
-                  "primary_language"
-                ] as string;
-              if (repoObj["size"])
-                repository.size = parseInt(repoObj["size"] as string);
-              if (repoObj["has_wiki"] !== undefined)
-                repository.hasWiki = Boolean(repoObj["has_wiki"]);
-              if (repoObj["has_pages"] !== undefined)
-                repository.hasPages = Boolean(repoObj["has_pages"]);
-              if (repoObj["archived"] !== undefined)
-                repository.archived = Boolean(repoObj["archived"]);
-              if (repoObj["disabled"] !== undefined)
-                repository.disabled = Boolean(repoObj["disabled"]);
-              if (repoObj["pushed_at"])
-                repository.pushed = repoObj["pushed_at"] as string;
 
               return repository;
             }
@@ -312,10 +276,7 @@ const Survey = () => {
       navigate("/opensource-list");
     } catch (error) {
       console.error("❌ API Error:", error);
-      dispatch(setError("서버 오류가 발생했습니다. 다시 시도해주세요."));
       dispatch(setLoading(false));
-      // 에러 처리 - 사용자에게 알림
-      alert("서버 오류가 발생했습니다. 다시 시도해주세요.");
     }
   };
 
@@ -324,15 +285,12 @@ const Survey = () => {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, []);
 
-  // Loading Screen 
-if (apiLoading) {
-  return (
-    <LoadingScreen
-      title="Finding repositories that match your interests..."
-    />
-  );
-}
-
+  // Loading Screen
+  if (apiLoading) {
+    return (
+      <LoadingScreen title="Finding repositories that match your interests..." />
+    );
+  }
 
   return (
     <div className="bg-bg-black w-full min-h-screen">
