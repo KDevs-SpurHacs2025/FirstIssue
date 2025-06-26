@@ -48,7 +48,7 @@ const OpenSourceDetail = () => {
 
         <div className="flex gap-6 flex-1 overflow-hidden">
           {/* Left Sidebar */}
-          <div className="w-80 flex-shrink-0">
+          <div className="w-96 flex-shrink-0">
             <div className="bg-blue-light p-6 rounded-lg border border-white border-opacity-10 h-full overflow-y-auto">
               <ActionPlan
                 contributionDirections={contributionDirections}

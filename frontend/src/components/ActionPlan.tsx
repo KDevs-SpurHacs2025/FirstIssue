@@ -31,8 +31,8 @@ export default function ActionPlan({
 
   return (
     <div className="action-plan mb-4">
-      <h6 className="text-lg font-semibold text-white mb-2">Action Plan</h6>
-      <div className="space-y-4">
+      <h4 className="text-lg font-semibold text-white mb-4">Action Plan</h4>
+      <div className="space-y-3">
         {/* Step 0: Explore the repo first */}
         <div className="relative">
           {/* Vertical line to connect to next step */}
@@ -58,7 +58,7 @@ export default function ActionPlan({
                 onClick={() => toggleStep(0)}
               >
                 <div className="flex items-center justify-between">
-                  <h4 className="text-[11px] font-medium text-white">
+                  <h4 className="text-sm font-medium text-white">
                     Step 0 - Explore the repo first!
                   </h4>
                   <span
@@ -75,17 +75,21 @@ export default function ActionPlan({
               <div
                 className={`overflow-hidden transition-all duration-300 ease-out ${
                   openSteps.has(0)
-                    ? "max-h-48 opacity-100 mt-1"
+                    ? "max-h-32 opacity-100 mt-1"
                     : "max-h-0 opacity-0 mt-0"
                 }`}
               >
-                <div className="p-2.5 bg-bg-black bg-opacity-50 rounded border border-white border-opacity-10">
+                <div className="p-2 bg-bg-black bg-opacity-50 rounded border border-white border-opacity-10">
+                  <p className="text-xs text-text-gray leading-relaxed mb-2">
+                    Before contributing, explore the repository to understand
+                    the project structure and goals.
+                  </p>
                   {repoUrl && (
                     <a
                       href={repoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 text-white text-[11px] rounded hover:bg-blue-700 transition-colors"
+                      className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
                     >
                       <svg
                         width="12"
@@ -104,15 +108,20 @@ export default function ActionPlan({
           </div>
         </div>
 
+        {/* Separator between Step 0 and other steps */}
+        {contributionDirections.length > 0 && (
+          <div className="my-3 border-t border-white border-opacity-10"></div>
+        )}
+
         {/* Existing contribution directions */}
         {contributionDirections.length > 0 &&
           contributionDirections.map((direction, index) => (
-            <div key={direction.number} className="relative">
+            <div key={direction.number} className="relative mb-2">
               {/* Vertical line (except for last item) - uses flex to fill space */}
               {index !== contributionDirections.length - 1 && (
                 <div
                   className="absolute left-4 top-8 w-0.5 bg-white bg-opacity-20"
-                  style={{ height: "calc(100% + 1.5rem)" }}
+                  style={{ height: "calc(100% + 2rem)" }}
                 />
               )}
 
@@ -135,7 +144,7 @@ export default function ActionPlan({
                     onClick={() => toggleStep(direction.number)}
                   >
                     <div className="flex items-center justify-between">
-                      <h4 className="text-[11px] font-medium text-white">
+                      <h4 className="text-sm font-medium text-white">
                         Step {direction.number} - {direction.title}
                       </h4>
                       <span
@@ -154,12 +163,12 @@ export default function ActionPlan({
                   <div
                     className={`overflow-hidden transition-all duration-300 ease-out ${
                       openSteps.has(direction.number)
-                        ? "max-h-48 opacity-100 mt-1"
+                        ? "max-h-32 opacity-100 mt-1"
                         : "max-h-0 opacity-0 mt-0"
                     }`}
                   >
-                    <div className="p-2.5 bg-bg-black bg-opacity-50 rounded border border-white border-opacity-10">
-                      <p className="text-[11px] text-text-gray leading-tight">
+                    <div className="p-2 bg-bg-black bg-opacity-50 rounded border border-white border-opacity-10">
+                      <p className="text-xs text-text-gray leading-relaxed whitespace-pre-line">
                         {direction.description}
                       </p>
                     </div>
