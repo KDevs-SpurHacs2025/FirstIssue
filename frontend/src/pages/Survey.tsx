@@ -704,7 +704,7 @@ const Survey = () => {
           <div className="flex justify-center w-full mt-10">
             <GradientButton
               type="submit"
-              className="px-14 py-2 text-lg font-medium transition-transform hover:scale-105"
+              className="px-14 py-2 text-lg font-medium transition-colors duration-300"
               aria-label="Submit survey"
             >
               Save
