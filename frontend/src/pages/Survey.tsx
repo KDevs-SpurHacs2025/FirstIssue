@@ -29,6 +29,7 @@ import { motion } from "framer-motion";
 import { questionBlockMotion } from "../animations/surveyAnimation";
 import Footer from "../components/Footer";
 import LoadingScreen from "../components/LoadingScreen";
+import AutocompleteTagsInput from "../components/AutocompleteTagsInput";
 
 // localStorage 관리 함수들
 interface SurveyAnswers {
@@ -544,19 +545,14 @@ const Survey = () => {
                 </span>
                 4. Languages or frameworks you’re confident in:
               </label>
-              <input
-                type="text"
-                className={inputClass}
-                placeholder="e.g. JavaScript, React, Python"
-                value={confidentLangs.join(", ")}
-                onChange={(e) =>
-                  dispatch(
-                    setConfidentLangs(
-                      e.target.value.split(",").map((s) => s.trim())
-                    )
-                  )
-                }
+              <AutocompleteTagsInput
+                value={confidentLangs}
+                onChange={(newTags) => dispatch(setConfidentLangs(newTags))}
               />
+              <div className="text-xs text-text-gray mt-1 ml-1">
+                After typing, press <b>Enter</b> (or comma, Tab) to add as a
+                tag.
+              </div>
             </motion.div>
             {/* 5. Enjoy using */}
             <motion.div
@@ -573,19 +569,14 @@ const Survey = () => {
                 </span>
                 5. Languages or frameworks you enjoy using:
               </label>
-              <input
-                type="text"
-                className={inputClass}
-                placeholder="e.g. TypeScript, Vue, Go"
-                value={enjoyLangs.join(", ")}
-                onChange={(e) =>
-                  dispatch(
-                    setEnjoyLangs(
-                      e.target.value.split(",").map((s) => s.trim())
-                    )
-                  )
-                }
+              <AutocompleteTagsInput
+                value={enjoyLangs}
+                onChange={(newTags) => dispatch(setEnjoyLangs(newTags))}
               />
+              <div className="text-xs text-text-gray mt-1 ml-1">
+                After typing, press <b>Enter</b> (or comma, Tab) to add as a
+                tag.
+              </div>
             </motion.div>
             {/* 6. Want to learn */}
             <motion.div
@@ -602,19 +593,14 @@ const Survey = () => {
                 </span>
                 6. Languages or frameworks you want to learn:
               </label>
-              <input
-                type="text"
-                className={inputClass}
-                placeholder="e.g. Rust, Svelte, Elixir"
-                value={learnLangs.join(", ")}
-                onChange={(e) =>
-                  dispatch(
-                    setLearnLangs(
-                      e.target.value.split(",").map((s) => s.trim())
-                    )
-                  )
-                }
+              <AutocompleteTagsInput
+                value={learnLangs}
+                onChange={(newTags) => dispatch(setLearnLangs(newTags))}
               />
+              <div className="text-xs text-text-gray mt-1 ml-1">
+                After typing, press <b>Enter</b> (or comma, Tab) to add as a
+                tag.
+              </div>
             </motion.div>
             {/* 7. Contribution count */}
             <motion.div
