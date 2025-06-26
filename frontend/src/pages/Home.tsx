@@ -4,6 +4,7 @@ import { useUser, useAppDispatch } from "../hooks/useRedux";
 import { useGetApi } from "../hooks/useGetApi";
 import { setTestUserId } from "../store/slices/userSlice";
 import { motion } from "framer-motion";
+import GradientHero from '../components/GradientHero';
 import {
   homeSection1Variants,
   homeSection1ItemVariants,
@@ -78,24 +79,24 @@ const Home = () => {
       {/* Hero Section */}
       <div
         id="hero"
-        className="w-full h-auto flex flex-col items-center justify-center text-center text-white mt-[60px] px-4 md:px-28 py-32"
+        className="relative w-full h-auto flex flex-col items-center justify-center text-center text-white mt-[60px] px-4 md:px-28 py-32"
         style={{ minHeight: "calc(100vh - 60px)" }}
       >
+          <GradientHero />
         <motion.h1
-          className="text-5xl font-bold mb-3 whitespace-pre-line bg-gradient-to-r from-fuchsia-400 to-cyan-400 bg-clip-text text-transparent inline-block"
+          className="text-5xl font-bold mb-3 whitespace-pre-line bg-gradient-to-r from-fuchsia-400 to-cyan-400 bg-clip-text text-transparent inline-block z-20"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.9 }}
         >
           {displayedTitle}
-          {!typingDone && <span className="inline-block animate-pulse">|</span>}
         </motion.h1>
-        <p className="text-md text-text-gray">
+        <p className="text-md text-text-gray z-50">
           Find beginner-friendly GitHub issues tailored to your skills and
           experience
         </p>
         <GradientButton
-          className="mt-10 px-6 py-2"
+          className="mt-10 px-6 py-2 z-20"
           onClick={handleGetStarted}
           disabled={isLoading}
         >

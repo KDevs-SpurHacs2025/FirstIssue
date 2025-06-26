@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { cardHoverMotion } from "../animations/listAnimation";
 
@@ -11,7 +11,7 @@ interface OpenSourceCardProps {
   languages: string[];
   difficulties: string[];
   description: string;
-  reasonForRecommendation?: string; // New prop for recommendation reason
+  reasonForRecommendation?: string; 
   url?: string; // Repository URL
   contributionDirections?: string[];
   onAdvancedInsights?: (repoId: number) => void;
@@ -30,13 +30,19 @@ const OpenSourceCard: React.FC<OpenSourceCardProps> = ({
   url,
   onAdvancedInsights,
 }) => {
+
+  // Hover cards
+  const [hovered, setHovered] = useState(false);
+
   return (
     <motion.div
       {...cardHoverMotion}
-      className="bg-blue-light/80 border border-blue-900/30 shadow-lg shadow-blue-900/10 rounded-2xl p-6 mb-8 w-full cursor-pointer"
+      className="relative bg-blue-light/80 border border-blue-900/30 shadow-lg shadow-blue-900/10 rounded-2xl p-6 mb-8 w-full cursor-pointer group"
       tabIndex={0}
       role="button"
       onClick={() => onAdvancedInsights?.(repoId)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
       {/* Top: Repo Name & Difficulties (left), Percentage (right) */}
 
@@ -115,10 +121,14 @@ const OpenSourceCard: React.FC<OpenSourceCardProps> = ({
       <div className="text-sm text-text-gray-light mb-3">{description}</div>
       
       {/* Reason for Recommendation */}
-      {reasonForRecommendation && (
-        <div className="border-t border-blue-900/20 pt-3">
-          <p className="text-xs font-semibold text-cyan-200 mb-1">Why this matches you:</p>
-          <p className="text-xs text-text-gray-light italic">{reasonForRecommendation}</p>
+        {hovered && (
+        <div className="absolute inset-0 bg-bg-black rounded-2xl flex flex-col items-center justify-center z-20 px-10 py-6 transition-all duration-300 ease-in-out">
+          <p className="text-text-gray-light text-sm font-semibold mb-2 text-center">
+            ✨ {reasonForRecommendation}
+          </p>
+          <p className="text-cyan-200 text-xs text-center mt-2">
+            <span className="font-bold">Click to view advanced insights and use the chatbot!</span>
+          </p>
         </div>
       )}
     </motion.div>

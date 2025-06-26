@@ -227,7 +227,7 @@ const OpenSourceList = () => {
     <div className="w-full h-auto bg-bg-black pt-[120px]">
       {/* Navbar and Header */}
       <Navbar />
-      <div className="flex justify-center items-center mb-8 px-40">
+      <div className="flex justify-center items-center mb-8">
         <h1 className="text-3xl font-bold text-white">Top Projects for You</h1>
       </div>
       <div className="flex justify-end items-center mb-6 px-40">
@@ -236,12 +236,12 @@ const OpenSourceList = () => {
           className="px-6 py-2 rounded-lg text-white font-semibold flex items-center"
           disabled={isLoading || apiLoading}
         >
-          Find More
+          Get New Matches
         </GradientButton>
       </div>
 
       {/* Repository Cards or Empty State */}
-      {repositories.length > 0 ? (
+     {repositories.length > 0 ? (
         <>
           {cards.map((card, idx) => (
             <div key={card.repoName + idx} className="w-full h-auto px-40">
