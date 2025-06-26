@@ -1,4 +1,6 @@
 import React from "react";
+import { motion } from "framer-motion";
+import { cardHoverMotion } from "../animations/listAnimation";
 
 interface OpenSourceCardProps {
   repoId: number;
@@ -27,55 +29,72 @@ const OpenSourceCard: React.FC<OpenSourceCardProps> = ({
   onAdvancedInsights,
 }) => {
   return (
-    <div className="bg-white rounded shadow p-6 mb-4">
-      <div className="flex justify-between items-center mb-2">
-        <h2 className="text-xl font-bold">{repoName}</h2>
-        <span className="text-blue-600 font-semibold">{percentage}% match</span>
-      </div>
-      <div className="text-sm text-gray-500 mb-2">
-        Created: {createdAt} &nbsp;|&nbsp; Updated: {updatedAt}
-      </div>
-      <div className="mb-2">
-        <span className="font-semibold">Languages/Frameworks:</span>{" "}
-        {languages.join(", ")}
-      </div>
-      <div className="mb-2">
-        <span className="font-semibold">Difficulties:</span>{" "}
-        {difficulties.join(", ")}
-      </div>
-      <p className="mb-4 text-gray-700">{description}</p>
-      {url && (
-        <div className="mb-4">
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors"
-          >
-            <svg
-              className="w-4 h-4 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-              />
-            </svg>
-            View Repository
-          </a>
-        </div>
-      )}
-      <button
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        onClick={() => onAdvancedInsights?.(repoId)}
+    <motion.div
+      {...cardHoverMotion}
+      className="bg-blue-light/80 border border-blue-900/30 shadow-lg shadow-blue-900/10 rounded-2xl p-6 mb-8 w-full cursor-pointer"
+      tabIndex={0}
+      role="button"
+      onClick={() => onAdvancedInsights?.(repoId)}
+    >
+      {/* Top: Repo Name & Difficulties (left), Percentage (right) */}
+
+<div className="flex flex-col md:flex-row md:items-center md:justify-between mb-1">
+  <div className="flex items-center gap-3">
+    <span className="text-xl font-bold text-white">{repoName}</span>
+    {/* Improved Difficulty Badge(s) */}
+    {difficulties.map((diff, idx) => (
+      <span
+        key={diff + idx}
+        className={
+          "px-2 py-0.5 rounded text-xs font-semibold shadow " +
+          (diff.toLowerCase() === "beginner"
+            ? "bg-green-500/80 text-white"
+            : diff.toLowerCase() === "intermediate"
+            ? "bg-yellow-500/80 text-white"
+            : "bg-pink-600/80 text-white")
+        }
+        style={{
+          letterSpacing: "0.02em",
+          textShadow: "0 1px 4px rgba(0,0,0,0.10)",
+        }}
       >
-        Advanced Insights
-      </button>
-    </div>
+        {diff}
+      </span>
+    ))}
+  </div>
+<span
+  className="text-cyan-100 text-base font-bold ml-4"
+>
+  {percentage}% match
+</span>
+</div>
+      {/* Dates */}
+      <div className="flex flex-wrap gap-2 text-xs text-text-gray">
+        <span>Created: {createdAt}</span>
+        <span>Updated: {updatedAt}</span>
+      </div>
+      {/* Languages - Liquid Glass Effect */}
+       <div className="flex flex-wrap gap-2 my-3">
+        {languages.map((lang, idx) => (
+          <span
+            key={lang + idx}
+            className="backdrop-blur-md border border-cyan-100/10 shadow-inner text-cyan-100 px-3 py-1 rounded-xl text-xs font-semibold"
+            style={{
+              background:
+                "linear-gradient(120deg, rgba(43, 86, 215, 0.1) 10%, rgba(114, 139, 238, 0.06) 100%)",
+              boxShadow: "0 4px 24px 0 rgba(0,255,255,0.07)",
+              border: "1px solid rgba(180,255,255,0.08)",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+            }}
+          >
+            {lang}
+          </span>
+        ))}
+      </div>
+      {/* Description */}
+      <div className="text-sm text-text-gray-light">{description}</div>
+    </motion.div>
   );
 };
 

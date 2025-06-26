@@ -218,18 +218,22 @@ const OpenSourceList = () => {
     <div className="w-full h-auto bg-bg-black pt-[120px]">
       {/* Navbar and Header */}
       <Navbar />
-      <div className="flex justify-between items-center mb-6 ">
-        <h1 className="text-2xl font-bold">
-          Open Source Project Recommendations
+      <div className="flex justify-center items-center mb-8 px-40">
+        <h1 className="text-3xl font-bold text-white">
+          Top Projects for You
         </h1>
-        <button
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+      </div>
+         <div className="flex justify-end items-center mb-6 px-40">
+           <GradientButton
           onClick={handleRegenerate}
+          className="px-6 py-2 rounded-lg text-white font-semibold flex items-center"
           disabled={isLoading || apiLoading}
         >
-          {isLoading || apiLoading ? "Loading..." : "Regenerate"}
-        </button>
-      </div>
+          Find More
+          </GradientButton>
+         </div>
+
+  
       {/* No repository page */}
       {repositories.length === 0 && (
         <div className="text-center py-48">
@@ -266,7 +270,8 @@ const OpenSourceList = () => {
       )}{" "}
       {repositories.length > 0 &&
         cards.map((card, idx) => (
-          <OpenSourceCard
+         <div className="w-full h-auto px-40">
+           <OpenSourceCard
             key={card.repoName + idx}
             repoId={card.repoId}
             repoName={card.repoName}
@@ -279,6 +284,7 @@ const OpenSourceList = () => {
             url={card.url}
             onAdvancedInsights={handleAdvancedInsights}
           />
+          </div>
         ))}
       {/* Footer */}
       <Footer />

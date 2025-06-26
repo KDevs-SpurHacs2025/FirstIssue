@@ -11,3 +11,9 @@ export const emptyIconDrawMotion: MotionProps = {
     ease: "easeInOut",
   },
 };
+
+// Card hover scale animation
+export const cardHoverMotion: MotionProps = {
+  whileHover: { scale: 1.009 },
+  transition: { type: "spring", stiffness: 300, damping: 20 },
+};
