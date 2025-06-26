@@ -21,7 +21,7 @@ const OpenSourceDetail = () => {
 
   return (
     <div className="w-full h-screen !overflow-hidden bg-bg-black flex flex-col">
-      <Navbar />
+      {/* <Navbar /> */}
       <div className="flex-1 px-4 py-6 flex flex-col overflow-hidden">
         <div className="flex justify-between items-center mb-6 flex-shrink-0">
           <button
@@ -30,13 +30,30 @@ const OpenSourceDetail = () => {
           >
             Back to List
           </button>
+          <h2 className="text-white text-lg font-semibold absolute left-1/2 transform -translate-x-1/2">
+            {currentRepo?.name ? (
+              <>
+                Discover how to contribute to{" "}
+                <span className="text-blue-400 font-bold">
+                  {currentRepo.name}
+                </span>
+                🧐
+              </>
+            ) : (
+              "Discover how to contribute to this repository"
+            )}
+          </h2>
+          <div></div>
         </div>
 
         <div className="flex gap-6 flex-1 overflow-hidden">
           {/* Left Sidebar */}
           <div className="w-80 flex-shrink-0">
             <div className="bg-blue-light p-6 rounded-lg border border-white border-opacity-10 h-full overflow-y-auto">
-              <ActionPlan contributionDirections={contributionDirections} />
+              <ActionPlan
+                contributionDirections={contributionDirections}
+                repoUrl={currentRepo?.url}
+              />
             </div>
           </div>
 
