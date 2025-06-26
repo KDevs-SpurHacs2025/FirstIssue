@@ -192,7 +192,7 @@ const OpenSourceList = () => {
 
   // 로딩 상태
   if (isLoading || apiLoading) {
-    return <LoadingScreen title="Loading your recommendations..." />;
+    return <LoadingScreen title="Finding new matches for you..." />;
   }
 
   // 에러 상태
