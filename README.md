@@ -14,9 +14,21 @@ A platform to help junior developers explore and contribute to open-source proje
 **Backend:** Express.js (TypeScript), Gemini API, MongoDB
 
 ## 🤝 Team Members
-- **Jay Mo:**:  Built UI using React and TypeScript ,  Managed global state using Redux ,Integrated backend APIs with robust error handling and data validation,Designed modular components for chatbot and survey-based UX
-- **Honggyu Park:** Backend & Gemini API integration, MongoDB setup  
-- **Hyunjin Kim:** UI/UX design, frontend styling and layout components  
+## 🤝 Team Members & Roles
+
+- **Jay Mo:**  
+  - Implemented core frontend logic using React and TypeScript  
+  - Managed global state using Redux  
+  - Integrated backend APIs with error handling and data validation  
+  - Built modular components for the survey, recommendation flow, and AI chatbot
+
+- **Honggyu Park:**  
+  - Developed backend server and Gemini API integration  
+  - Set up MongoDB schema and data operations
+
+- **Hyunjin Kim:**  
+  - Designed user interface mockups  
+  - Contributed to responsive frontend layout and styling 
 
 ## 📽️ Demo Video
 
