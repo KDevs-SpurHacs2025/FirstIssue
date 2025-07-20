@@ -1,4 +1,4 @@
-# FirstIssue – AI-Powered Open Source Recommender & Chatbot (HackTheBrain 2025)
+# FirstIssue – AI-Powered Open Source Recommender & Chatbot 
 
 A platform to help junior developers explore and contribute to open-source projects through personalized AI recommendations and guided action plans.
 
