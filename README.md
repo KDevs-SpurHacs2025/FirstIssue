@@ -13,8 +13,7 @@ A platform to help junior developers explore and contribute to open-source proje
 **Frontend:** React, TypeScript, TailwindCSS, Redux, Framer Motion  
 **Backend:** Express.js (TypeScript), Gemini API, MongoDB
 
-## 🤝 Team Members
-## 🤝 Team Members & Roles
+## 🤝 Team Contribution
 
 - **Jay Mo:**  
   - Implemented core frontend logic using React and TypeScript  
