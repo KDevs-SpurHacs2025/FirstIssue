@@ -13,22 +13,6 @@ A platform to help junior developers explore and contribute to open-source proje
 **Frontend:** React, TypeScript, TailwindCSS, Redux, Framer Motion  
 **Backend:** Express.js (TypeScript), Gemini API, MongoDB
 
-## 🤝 Team Contribution
-
-- **Jay Mo:**  
-  - Implemented core frontend logic using React and TypeScript  
-  - Managed global state using Redux  
-  - Integrated backend APIs with error handling and data validation  
-  - Built modular components for the survey, recommendation flow, and AI chatbot
-
-- **Honggyu Park:**  
-  - Developed backend server and Gemini API integration  
-  - Set up MongoDB schema and data operations
-
-- **Hyunjin Kim:**  
-  - Designed user interface mockups  
-  - Contributed to responsive frontend layout and styling 
-
 ## 📽️ Demo Video
 
 [Watch here](https://drive.google.com/file/d/1mFd2dCb9ntKpfzIdjzjRblRYeI6HzZDm/view?usp=sharing)
